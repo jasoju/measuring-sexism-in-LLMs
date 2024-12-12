@@ -2,7 +2,7 @@ import transformers
 import torch
 import os
 
-os.environ["HF_TOKEN"] = "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"
+HF_TOKEN = os.getenv('HF_TOKEN')
 
 model_id = "meta-llama/Llama-3.1-8B-Instruct"
 
