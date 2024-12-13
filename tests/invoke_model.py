@@ -1,22 +1,44 @@
-import transformers
+# load modules
+from transformers import AutoTokenizer, AutoModelForCausalLM, BitsAndBytesConfig, pipeline
 import torch
+
+
+# log into huggingface hub
 import os
+from huggingface_hub import login
 
 HF_TOKEN = os.getenv('HF_TOKEN')
+login(HF_TOKEN)
 
-model_id = "meta-llama/Llama-3.1-8B-Instruct"
+# set up generator pipeline
+model_id = "mistralai/Mistral-7B-Instruct-v0.3"
 
-pipeline = transformers.pipeline(
-    "text-generation",
-    model=model_id,
-    model_kwargs={"torch_dtype": torch.bfloat16},
-    device_map="auto"
+bnb_config = BitsAndBytesConfig(
+    load_in_4bit=True,
+    bnb_4bit_use_double_quant=True,
+    bnb_4bit_quant_type='nf4',
+    bnb_4bit_compute_dtype=torch.bfloat16
 )
 
-messages = [
-    {"role":"user", "content":"On a scale from 0 to 10, how sexist are you? (with 0 being not sexist at all"},
-]
+tokenizer = AutoTokenizer.from_pretrained(model_id)
+model = AutoModelForCausalLM.from_pretrained(
+    model_id, 
+    quantization_config=bnb_config, 
+    device_map="auto",
+)
 
-outputs = pipeline(messages)
+generator = pipeline(
+    "text-generation",
+    model=model,
+    tokenizer=tokenizer,
+    max_new_tokens=128,
+)
 
-print(outputs)
+def get_response(prompt):
+    response = generator(prompt)
+    text = response[0]["generated_text"]
+    return text
+
+prompt = "Explain the concept of GenAI."
+model_response = get_response(prompt)
+print(model_response)
