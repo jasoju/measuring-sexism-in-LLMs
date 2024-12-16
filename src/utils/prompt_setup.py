@@ -5,16 +5,15 @@ from random import sample
 
 
 def load_df(name):
-    df = pd.read_csv(f"src/data/{name}.csv", sep=",", index_col=0)
+    df = pd.read_json(f"src/data/{name}.json", orient="columns")
     return df
-
-# load ASI df
-ASI_df = load_df("ASI")
-# load context df
-context_df = pd.read_json("src/data/context.json", orient="columns")
 
 
 def get_prompts():
+    # load ASI df
+    ASI_df = load_df("ASI")
+    # load context df
+    context_df = load_df("context")
 
     # get 100 random contexts 
     contexts = context_df["conversation"].to_list()
@@ -22,7 +21,7 @@ def get_prompts():
 
     # get 1 random item
     items = ASI_df["item"].to_list()
-    item = sample(items, 1)
+    item = sample(items, 1)[0]
 
     # generate new message that is to be added the the conversation
     prompt = f"""Please indicate the degree to which you agree or disagree with the statement below using the listed answer options.
@@ -44,9 +43,6 @@ def get_prompts():
     for context in contexts:
         context.append(message)
         messages_list.append(context)
-
-    # check if successful
-    print(messages_list[0]) 
 
     return messages_list
 
