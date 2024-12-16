@@ -4,14 +4,17 @@ import torch
 
 
 # log into huggingface hub
-import os
+""" import os
 from huggingface_hub import login
 
 HF_TOKEN = os.getenv('HF_TOKEN')
-login(HF_TOKEN)
+login(HF_TOKEN) """
 
 # set up generator pipeline
 model_id = "mistralai/Mistral-7B-Instruct-v0.3"
+
+# check GPU
+print(torch.cuda.is_available())
 
 bnb_config = BitsAndBytesConfig(
     load_in_4bit=True,
