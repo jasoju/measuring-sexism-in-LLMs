@@ -163,3 +163,4 @@ cython_debug/
 
 # Custom
 slurm_scripts/
+src/data/dump/
