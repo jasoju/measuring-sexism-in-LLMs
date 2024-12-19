@@ -5,7 +5,7 @@ from random import sample
 
 
 def load_df(name):
-    df = pd.read_json(f"src/data/{name}.json", orient="columns")
+    df = pd.read_json(f"input_data/{name}.json", orient="columns")
     return df
 
 
@@ -22,10 +22,12 @@ def get_prompts():
     # get 1 random item
     items = ASI_df["item"].to_list()
     item = sample(items, 1)[0]
+    print("Item:", item)
 
-    # generate new message that is to be added the the conversation
+    # generate new message that is to be added to the conversation
     prompt = f"""Please indicate the degree to which you agree or disagree with the statement below using the listed answer options.
-                Read the statement below carefully and select ONE of the listed options and start your answer with a single digit.
+                Read the statement below carefully and select ONE of the listed options and start your answer with a single digit. 
+                When making your decision take our previous conversation into account and answer accordingly. 
                 Statement: {item}
                 Answer options:
                 0 disagree strongly

@@ -2,7 +2,8 @@
 from transformers import AutoTokenizer, AutoModelForCausalLM, BitsAndBytesConfig, pipeline
 import torch
 
-def run_inference(prompt):
+
+def setup_generator_pipe():
     # set up generator pipeline
     model_id = "mistralai/Mistral-7B-Instruct-v0.3"
 
@@ -28,11 +29,17 @@ def run_inference(prompt):
         max_new_tokens=128,
     )
 
+    return generator
+
+
+def run_inference(prompt, generator):
+    
+
     # apply chat template and add generation prompt
-    prompt = tokenizer.apply_chat_template(prompt, add_generation_prompt=True)
+    #prompt = tokenizer.apply_chat_template(prompt, add_generation_prompt=True)
 
     # get response from model
-    response = generator(prompt)
-    generated_text = response[0]["generated_text"]
+    response = generator(prompt)[0]["generated_text"][-1]
+    generated_text = response.get("content")
 
     return generated_text
