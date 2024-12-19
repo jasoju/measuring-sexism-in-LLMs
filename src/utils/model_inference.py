@@ -3,10 +3,8 @@ from transformers import AutoTokenizer, AutoModelForCausalLM, BitsAndBytesConfig
 import torch
 
 
-def setup_generator_pipe():
+def setup_generator_pipe(model_id):
     # set up generator pipeline
-    model_id = "mistralai/Mistral-7B-Instruct-v0.3"
-
     bnb_config = BitsAndBytesConfig(
         load_in_4bit=True,
         bnb_4bit_use_double_quant=True,
@@ -33,9 +31,7 @@ def setup_generator_pipe():
 
 
 def run_inference(prompt, generator):
-    
-
-    # apply chat template and add generation prompt
+    # apply chat template and add generation prompt (does not work)
     #prompt = tokenizer.apply_chat_template(prompt, add_generation_prompt=True)
 
     # get response from model
