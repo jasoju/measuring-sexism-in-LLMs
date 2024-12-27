@@ -50,20 +50,24 @@ def create_df(context:str, task_name:str) -> pd.DataFrame:
     context_df["key"] = 1
     merged_df = pd.merge(task_df, context_df, on="key").drop("key", axis=1)
 
-    # DOES NOT WORK FOR PERSONA CONTEXTS!!!!
-    def create_chat(item, conversation):
+    def create_message_list(item, context):
         # set up new message containing the prompt
         prompt = create_prompt(task_name, item)
         message = {'content': prompt, 'role': 'user'}
         # add new message to conversation to create final chat
-        updated_conversation = conversation.copy()
-        updated_conversation.append(message)
+        message_list = context.copy()
+        message_list.append(message)
 
-        return updated_conversation
+        return message_list
     
-    # apply create chat function to every row
-    merged_df["prompt"] = pd.Series([create_chat(item, conversation) for (item, conversation) in zip(merged_df["item"], merged_df["conversation"])])
-    
+    # apply create chat function to every row (input columns depend on context type)
+    if context == "chatbot_arena_conv":
+        merged_df["prompt"] = pd.Series([create_message_list(item, conversation) for (item, conversation) in zip(merged_df["item"], merged_df["conversation"])])
+    elif context == "persona_hub":
+        merged_df["prompt"] = pd.Series([create_message_list(item, persona) for (item, persona) in zip(merged_df["item"], merged_df["persona_prompt"])])
+    else:
+        raise ValueError(f"{context} as context type is not allowed.")
+
     return merged_df
 
 

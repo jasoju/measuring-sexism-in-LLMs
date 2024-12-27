@@ -3,9 +3,10 @@ from dataclasses import dataclass, field
 from typing import Optional
 import numpy as np
 from datetime import datetime
+import os
 
 from utils.extract_answer import extract_answer
-from utils.prompt_setup import get_prompts
+from utils.prompt_setup import create_df
 from utils.model_inference import setup_generator_pipe, run_inference
 
 
@@ -41,14 +42,16 @@ class Arguments:
 
 # main function that collects the data
 def collect_data():
+    #os.environ['HF_HOME'] = "/pfs/work7/workspace/scratch/ma_janjung-master-thesis"
+
     parser = HfArgumentParser(Arguments)
     args = parser.parse_args_into_dataclasses()[0]
 
     # set up generator 
     generator = setup_generator_pipe(args.model_id)
 
-    # put together dataframe containing the prompts
-    df = get_prompts(args.context_data, args.task_data)
+    # put together dataframe containing the final prompts
+    df = create_df(args.context_data, args.task_data)
     prompt_list = df["prompt"].values.tolist()
 
     # iterate over prompts and generate reponse and extraxt answer from response
@@ -73,8 +76,10 @@ def collect_data():
     now = datetime.now()
     dt_string = now.strftime("%Y-%m-%d_%H-%M")
 
+    file_name = f"{args.model_id}__{args.context_data}__{args.task_data}__{dt_string}.csv"
     # save completed df in output dir
-    df.to_csv(f"{args.output_dir}/{args.model_id}__{args.context_data}__{args.task_data}__{dt_string}.csv")
+    output_dir_file = os.path.join(args.output_dir, file_name)
+    df.to_json(output_dir_file)
 
 if __name__== "__main__":
     # sample run: python collect_data.py --context_data chatbot_arena_conv --task_data ASI
