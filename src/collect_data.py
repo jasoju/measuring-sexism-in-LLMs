@@ -2,6 +2,7 @@ from transformers import HfArgumentParser
 from dataclasses import dataclass, field
 from typing import Optional
 import numpy as np
+import pandas as pd
 from datetime import datetime
 import os
 
@@ -50,27 +51,21 @@ def collect_data():
     # set up generator 
     generator = setup_generator_pipe(args.model_id)
 
-    # put together dataframe containing the final prompts
+    # put together pandas dataframe containing the final prompts
     df = create_df(args.context_data, args.task_data)
-    prompt_list = df["prompt"].values.tolist()
-
-    # iterate over prompts and generate reponse and extraxt answer from response
-    response_list = []
-    answer_list = []
-    for prompt in prompt_list:
-        # get response
-        response = run_inference(prompt, generator)
-        response_list.append(response)
-        # extract answer (not applicable for predictive validity task)
-        if args.task_data == "ref_letter_gen":
-            answer_list = [np.nan] * len(response_list)
-        else:
-            answer = extract_answer(response, args.task_data)
-            answer_list.append(answer)
-
-    # add responses and answers to df
+     
+    # get response list
+    response_list = run_inference(generator, df)
+    # add responses to df
     df["response"] = response_list
-    df["answer"] = answer_list
+
+
+    # extract answers from responses (not applicable for predictive validity task)
+    if args.task_data == "ref_letter_gen":
+        df["answer"] = [np.nan] * len(response_list)
+    else:
+        df["answer"] = pd.Series([extract_answer(response) for response in df["response"]])
+    
 
     # get current date and time
     now = datetime.now()

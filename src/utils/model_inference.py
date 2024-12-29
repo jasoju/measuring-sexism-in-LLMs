@@ -1,9 +1,13 @@
 # load modules
+import transformers
 from transformers import AutoTokenizer, AutoModelForCausalLM, BitsAndBytesConfig, pipeline
+from datasets import Dataset
 import torch
+import pandas as pd
+from tqdm import tqdm
 
 
-def setup_generator_pipe(model_id):
+def setup_generator_pipe(model_id:str) -> transformers.TextGenerationPipeline:
     # set up generator pipeline
     bnb_config = BitsAndBytesConfig(
         load_in_4bit=True,
@@ -30,12 +34,17 @@ def setup_generator_pipe(model_id):
     return generator
 
 
-def run_inference(prompt, generator):
-    # apply chat template and add generation prompt (does not work)
-    #prompt = tokenizer.apply_chat_template(prompt, add_generation_prompt=True)
+def run_inference(generator:transformers.TextGenerationPipeline, df:pd.DataFrame) -> list:
+    # iterable from data
+    def data(dataset):
+        for row in dataset:
+            yield row["prompt"]
 
-    # get response from model
-    response = generator(prompt)[0]["generated_text"][-1]
-    generated_text = response.get("content")
+    # convert pandas df to huggingface dataset
+    dataset = Dataset.from_pandas(df)
 
-    return generated_text
+    response_list = []
+    for output in tqdm(generator(data(dataset))):
+        response_list.append(output[0]["generated_text"][-1].get("content"))
+
+    return response_list
