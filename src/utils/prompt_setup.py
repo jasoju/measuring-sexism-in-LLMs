@@ -45,7 +45,7 @@ def create_df(context:str, task_name:str) -> pd.DataFrame:
     # load context df
     context_df = load_df(context)
     # TEST SETTING: only use 10 first rows
-    context_df = context_df.head(10)
+    # context_df = context_df.head(10)
 
     # create cartesian product of the two dataframes
     task_df["key"] = 1  # temporary key for Cartesian product

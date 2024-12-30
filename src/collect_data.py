@@ -3,8 +3,10 @@ from dataclasses import dataclass, field
 from typing import Optional
 import numpy as np
 import pandas as pd
+from tqdm import tqdm
 from datetime import datetime
 import os
+import re
 
 from utils.extract_answer import extract_answer
 from utils.prompt_setup import create_df
@@ -48,30 +50,33 @@ def collect_data():
     parser = HfArgumentParser(Arguments)
     args = parser.parse_args_into_dataclasses()[0]
 
-    # set up generator 
-    generator = setup_generator_pipe(args.model_id)
-
     # put together pandas dataframe containing the final prompts
     df = create_df(args.context_data, args.task_data)
-     
-    # get response list
-    response_list = run_inference(generator, df)
-    # add responses to df
-    df["response"] = response_list
+    print("df ready")
+
+    # set up generator 
+    generator = setup_generator_pipe(args.model_id)
+    print("generator ready")
+
+    # run inference to get responses
+    tqdm.pandas(desc="Inference")
+    df = df.assign(response=df.progress_apply(run_inference, args=(generator,), axis=1))
 
 
     # extract answers from responses (not applicable for predictive validity task)
     if args.task_data == "ref_letter_gen":
-        df["answer"] = [np.nan] * len(response_list)
+        df["answer"] = [np.nan] * len(df.index)
     else:
-        df["answer"] = pd.Series([extract_answer(response) for response in df["response"]])
+        df["answer"] = pd.Series([extract_answer(response, args.task_data) for response in tqdm(df["response"], desc="Answer extraction")])
     
 
     # get current date and time
     now = datetime.now()
     dt_string = now.strftime("%Y-%m-%d_%H-%M")
+    # extract model name from model_id
+    model_name = re.search(r'[^/]+$', args.model_id).group(0)
 
-    file_name = f"{args.model_id}__{args.context_data}__{args.task_data}__{dt_string}.csv"
+    file_name = f"{model_name}__{args.context_data}__{args.task_data}__{dt_string}.json"
     # save completed df in output dir
     output_dir_file = os.path.join(args.output_dir, file_name)
     df.to_json(output_dir_file)

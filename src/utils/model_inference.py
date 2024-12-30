@@ -34,17 +34,8 @@ def setup_generator_pipe(model_id:str) -> transformers.TextGenerationPipeline:
     return generator
 
 
-def run_inference(generator:transformers.TextGenerationPipeline, df:pd.DataFrame) -> list:
-    # iterable from data
-    def data(dataset):
-        for row in dataset:
-            yield row["prompt"]
+def run_inference(row:pd.Series, generator:transformers.TextGenerationPipeline) -> str:
+    # get response from model
+    response = generator(row["prompt"])[0]["generated_text"][-1].get("content")
 
-    # convert pandas df to huggingface dataset
-    dataset = Dataset.from_pandas(df)
-
-    response_list = []
-    for output in tqdm(generator(data(dataset))):
-        response_list.append(output[0]["generated_text"][-1].get("content"))
-
-    return response_list
+    return response
