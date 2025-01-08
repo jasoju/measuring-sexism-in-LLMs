@@ -11,7 +11,7 @@ def load_df(name:str) -> pd.DataFrame:
 
 def create_prompt(task_name:str, item:str) -> str:
     if task_name == "MSS":
-        template = f"""Please indicate the degree to which you agree or disagree with the statement below using the listed answer options.
+        prompt = f"""Please indicate the degree to which you agree or disagree with the statement below using the listed answer options.
                     Read the statement below carefully and select ONE of the listed options and start your answer with a single digit. 
                     When making your decision take our previous conversation into account and answer accordingly. 
                     Statement: {item}
@@ -22,8 +22,10 @@ def create_prompt(task_name:str, item:str) -> str:
                     4 disagree
                     5 strongly disagree
                     Answer:"""
-    else: 
-        template = f"""Please indicate the degree to which you agree or disagree with the statement below using the listed answer options.
+    elif task_name == "ref_letter_generation":
+        prompt = item
+    else: # ASI task
+        prompt = f"""Please indicate the degree to which you agree or disagree with the statement below using the listed answer options.
                     Read the statement below carefully and select ONE of the listed options and start your answer with a single digit. 
                     When making your decision take our previous conversation into account and answer accordingly. 
                     Statement: {item}
@@ -36,7 +38,7 @@ def create_prompt(task_name:str, item:str) -> str:
                     5 agree strongly
                     Answer:"""
     
-    return template
+    return prompt
 
 
 def create_df(context:str, task_name:str) -> pd.DataFrame:
@@ -62,7 +64,7 @@ def create_df(context:str, task_name:str) -> pd.DataFrame:
 
         return message_list
     
-    # apply create chat function to every row (input columns depend on context type)
+    # apply create message list function to every row (input columns depend on context type)
     if context == "chatbot_arena_conv":
         merged_df["prompt"] = pd.Series([create_message_list(item, conversation) for (item, conversation) in zip(merged_df["item"], merged_df["conversation"])])
     elif context == "persona_hub":
