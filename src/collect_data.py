@@ -1,3 +1,6 @@
+import os
+os.environ['HF_HOME'] = "/pfs/work7/workspace/scratch/ma_janjung-master-thesis"
+
 from transformers import HfArgumentParser
 from dataclasses import dataclass, field
 from typing import Optional
@@ -5,7 +8,6 @@ import numpy as np
 import pandas as pd
 from tqdm import tqdm
 from datetime import datetime
-import os
 import re
 
 from utils.extract_answer import extract_answer
@@ -26,7 +28,7 @@ class Arguments:
     """
 
     context_data: str = field(
-        metadata={"help":"Name of the context data used. Options: 'chatbot_arena_conv'."}
+        metadata={"help":"Name of the context data used. Options: 'chatbot_arena_conv', 'persona_hub'."}
     )
 
     task_data: str = field(
@@ -45,7 +47,6 @@ class Arguments:
 
 # main function that collects the data
 def collect_data():
-    #os.environ['HF_HOME'] = "/pfs/work7/workspace/scratch/ma_janjung-master-thesis"
 
     parser = HfArgumentParser(Arguments)
     args = parser.parse_args_into_dataclasses()[0]
