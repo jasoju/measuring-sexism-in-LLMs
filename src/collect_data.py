@@ -65,7 +65,7 @@ def collect_data():
 
 
     # extract answers from responses (not applicable for predictive validity task)
-    if args.task_data == "ref_letter_gen":
+    if args.task_data == "ref_letter_generation":
         df["answer"] = [np.nan] * len(df.index)
     else:
         df["answer"] = pd.Series([extract_answer(response, args.task_data) for response in tqdm(df["response"], desc="Answer extraction")])
