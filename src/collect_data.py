@@ -37,11 +37,16 @@ class Arguments:
 
     model_id: Optional[str] = field(
         default="mistralai/Mistral-7B-Instruct-v0.3",
-        metadata={"help":"Model_id from huggingface hub"}
+        metadata={"help":"Model_id from huggingface hub (e.g. cognitivecomputations/dolphin-2.8-mistral-7b-v02)"}
     )
 
     output_dir: Optional[str] = field(
         default="output_data"
+    )
+
+    random: Optional[bool] = field(
+        default=False,
+        metadata={"help":"Indicating if the answer options are shuffled randomly."}
     )
 
 
@@ -52,7 +57,7 @@ def collect_data():
     args = parser.parse_args_into_dataclasses()[0]
 
     # put together pandas dataframe containing the final prompts
-    df = create_df(args.context_data, args.task_data)
+    df = create_df(args.context_data, args.task_data, args.random)
     print("df ready")
 
     # set up generator 

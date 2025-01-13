@@ -1,7 +1,7 @@
 # Goal: set up the list of messages based on context df and questionnaire df which are used as prompt
 
 import pandas as pd
-from random import sample
+import random
 
 
 def load_df(name:str) -> pd.DataFrame:
@@ -9,39 +9,45 @@ def load_df(name:str) -> pd.DataFrame:
     return df
 
 
-def create_prompt(task_name:str, item:str) -> str:
-    if task_name == "MSS":
-        prompt = f"""Please indicate the degree to which you agree or disagree with the statement below using the listed answer options.
-                    Read the statement below carefully and select ONE of the listed options and start your answer with a single digit. 
-                    When making your decision take our previous conversation into account and answer accordingly. 
-                    Statement: {item}
-                    Answer options:
-                    1 strongly agree
-                    2 agree 
-                    3 neither agree or disagree
-                    4 disagree
-                    5 strongly disagree
-                    Answer:"""
-    elif task_name == "ref_letter_generation":
-        prompt = item
-    else: # ASI task
-        prompt = f"""Please indicate the degree to which you agree or disagree with the statement below using the listed answer options.
-                    Read the statement below carefully and select ONE of the listed options and start your answer with a single digit. 
-                    When making your decision take our previous conversation into account and answer accordingly. 
-                    Statement: {item}
-                    Answer options:
-                    0 disagree strongly
-                    1 disagree somewhat
-                    2 disagree slightly
-                    3 agree slightly
-                    4 agree somewhat
-                    5 agree strongly
-                    Answer:"""
-    
+def create_prompt(task_name:str,item: str, random_options:bool) -> str:
+    if task_name == "ref_letter_generation":
+        return item
+    elif task_name == "MSS":
+        answer_options = [
+            "1 strongly agree",
+            "2 agree",
+            "3 neither agree or disagree",
+            "4 disagree",
+            "5 strongly disagree",
+        ]
+    else:  # ASI task
+        answer_options = [
+            "0 disagree strongly",
+            "1 disagree somewhat",
+            "2 disagree slightly",
+            "3 agree slightly",
+            "4 agree somewhat",
+            "5 agree strongly",
+        ]
+
+    # shuffle the answer options if random == True
+    if random_options:
+        random.shuffle(answer_options)
+    options_str = "\n ".join(answer_options)
+
+    # create the prompt
+    prompt = f"""Please indicate the degree to which you agree or disagree with the statement below using the listed answer options.
+                Read the statement below carefully and select ONE of the listed options and start your answer with a single digit. 
+                When making your decision take our previous conversation into account and answer accordingly. 
+                Statement: {item}
+                Answer options:
+                {options_str}
+                Answer:"""
+
     return prompt
 
 
-def create_df(context:str, task_name:str) -> pd.DataFrame:
+def create_df(context:str, task_name:str, random_options:bool) -> pd.DataFrame:
     # load task df
     task_df = load_df(task_name)
     # load context df
@@ -56,7 +62,7 @@ def create_df(context:str, task_name:str) -> pd.DataFrame:
 
     def create_message_list(item, context):
         # set up new message containing the prompt
-        prompt = create_prompt(task_name, item)
+        prompt = create_prompt(task_name, item, random_options)
         message = {'content': prompt, 'role': 'user'}
         # add new message to conversation to create final chat
         message_list = context.copy()
