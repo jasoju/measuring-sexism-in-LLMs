@@ -1,0 +1,97 @@
+---
+title: "Reliability & convergent validty"
+author: "Jana Jung"
+date: "15 1 2025"
+output: pdf_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+knitr::opts_knit$set(root.dir = "C:/Users/jana/PycharmProjects/Master_Thesis/src")
+```
+
+
+
+```{r packages message=FALSE}
+# load packages
+library(tidyverse)
+library(haven)
+library(psych)
+library(sirt)
+```
+
+
+
+```{r}
+# load data
+index <- "question_id"
+ASI <- read.csv("output_data/wide/wide__dolphin-2.8-mistral-7b-v02__chatbot_arena_conv__ASI__2025-01-08_22-59.csv", header=TRUE, row.names=index)
+
+MSS <- read_csv("", row.names=index)
+```
+
+# Internal consistency
+
+## ASI
+
+### Cronbach's alpha (stratified)
+
+```{r}
+# define item strata
+itemstrata <- rbind(c("X1","B"),
+                    c("X2","H"),
+                    c("X3","B"),
+                    c("X4","H"),
+                    c("X5","H"),
+                    c("X6","B"),
+                    c("X7","H"),
+                    c("X8","B"),
+                    c("X9","B"),
+                    c("X10","H"),
+                    c("X11","H"),
+                    c("X12","B"),
+                    c("X13","B"),
+                    c("X14","H"),
+                    c("X15","H"),
+                    c("X16","H"),
+                    c("X17","B"),
+                    c("X18","H"),
+                    c("X19","B"),
+                    c("X20","B"),
+                    c("X21","H"),
+                    c("X22","B")
+                    )
+
+stratified.cronbach.alpha(ASI, itemstrata = itemstrata)
+```
+
+
+### McDonald's omega
+
+```{r}
+omega(ASI, flip = FALSE)
+```
+
+## MSS
+
+### Cronbach's alpha
+
+```{r}
+alpha(MSS)
+```
+
+
+### McDonald's omega
+
+```{r}
+omega(MSS, flip = FALSE)
+```
+
+
+
+
+# Convergent validity
+
+
+
+
