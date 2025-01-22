@@ -18,17 +18,49 @@ library(tidyverse)
 library(haven)
 library(psych)
 library(sirt)
+library(glue)
 ```
 
 
 
 ```{r}
-# load data
-index <- "question_id"
-ASI <- read.csv("output_data/wide/wide__dolphin-2.8-mistral-7b-v02__chatbot_arena_conv__ASI__2025-01-08_22-59.csv", header=TRUE, row.names=index)
+# load ASI data
+file_ASI <- "wide__Mistral-7B-Instruct-v0.3__persona_hub__ASI__2025-01-04_02-54"
 
-MSS <- read_csv("", row.names=index)
+# wide__dolphin-2.8-mistral-7b-v02__chatbot_arena_conv__ASI__2025-01-08_22-59
+# wide__dolphin-2.8-mistral-7b-v02__persona_hub__ASI__2025-01-21_01-02
+# wide__Mistral-7B-Instruct-v0.3__chatbot_arena_conv__ASI__2024-12-30_19-25
+# wide__Mistral-7B-Instruct-v0.3__persona_hub__ASI__2025-01-04_02-54
+
+index <- "persona_id" # question_id / persona_id
+dir_ASI <- glue("output_data/wide/{file_ASI}.csv")
+
+ASI <- read.csv(dir_ASI, header=TRUE, row.names=index)
 ```
+
+
+```{r}
+# load MSS data
+file_MSS <- "wide__Mistral-7B-Instruct-v0.3__persona_hub__MSS__2025-01-18_06-51"
+
+# wide__dolphin-2.8-mistral-7b-v02__chatbot_arena_conv__MSS__2025-01-10_22-50
+# wide__dolphin-2.8-mistral-7b-v02__persona_hub__MSS__2025-01-10_20-49
+# wide__Mistral-7B-Instruct-v0.3__chatbot_arena_conv__MSS__2025-01-18_01-28
+# wide__Mistral-7B-Instruct-v0.3__persona_hub__MSS__2025-01-18_06-51
+
+dir_MSS <- glue("output_data/wide/{file_MSS}.csv")
+
+MSS <- read.csv(dir_MSS, header=TRUE, row.names=index) # uses same index as ASI
+```
+
+
+```{r}
+# only select columns with variance > 0 (needed for omega calculation)
+ASI_filtered <- ASI[, apply(ASI, 2, var) > 0]
+MSS_filtered <- MSS[, apply(MSS, 2, var) > 0]
+
+```
+
 
 # Internal consistency
 
@@ -69,7 +101,7 @@ stratified.cronbach.alpha(ASI, itemstrata = itemstrata)
 ### McDonald's omega
 
 ```{r}
-omega(ASI, flip = FALSE)
+omega(ASI_filtered, flip = FALSE)
 ```
 
 ## MSS
@@ -84,13 +116,27 @@ alpha(MSS)
 ### McDonald's omega
 
 ```{r}
-omega(MSS, flip = FALSE)
+omega(MSS_filtered, flip = FALSE)
 ```
 
 
 
 
 # Convergent validity
+
+```{r}
+# calculate total score value for each context
+ASI$total <- rowMeans(ASI, na.rm = TRUE)
+MSS$total <- rowMeans(MSS, na.rm = TRUE)
+
+```
+
+```{r}
+# calculate correlation (pearson)
+cor(ASI$total, MSS$total)
+
+
+```
 
 
 
