@@ -1,0 +1,28 @@
+---
+title: "Factorial validity"
+author: "Jana Jung"
+date: "16 1 2025"
+output: pdf_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+knitr::opts_knit$set(root.dir = "C:/Users/jana/PycharmProjects/Master_Thesis/src")
+```
+
+
+
+```{r packages message=FALSE}
+# load packages
+library(tidyverse)
+library(haven)
+library(psych)
+library(lavaan)
+```
+
+
+
+```{r}
+# load data
+ASI <- read.csv("output_data/wide/wide__dolphin-2.8-mistral-7b-v02__chatbot_arena_conv__ASI__2025-01-08_22-59.csv")
+```
