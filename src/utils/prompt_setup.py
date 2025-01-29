@@ -4,12 +4,15 @@ import pandas as pd
 import random
 
 
-def load_df(name:str) -> pd.DataFrame:
-    df = pd.read_json(f"input_data/{name}.json", orient="columns")
+def load_df(name:str|None) -> pd.DataFrame:
+    if name is None:
+        df = pd.DataFrame()
+    else:
+        df = pd.read_json(f"input_data/{name}.json", orient="columns")
     return df
 
 
-def create_prompt(task_name:str,item: str, random_options:bool) -> str:
+def create_prompt(task_name:str|None,item: str, random_options:bool) -> str:
     if task_name == "ref_letter_generation":
         return item
     elif task_name == "MSS":
@@ -47,7 +50,7 @@ def create_prompt(task_name:str,item: str, random_options:bool) -> str:
     return prompt
 
 
-def create_df(context:str, task_name:str, random_options:bool) -> pd.DataFrame:
+def create_df(context:str|None, task_name:str, random_options:bool) -> pd.DataFrame:
     # load task df
     task_df = load_df(task_name)
     # load context df
@@ -55,17 +58,23 @@ def create_df(context:str, task_name:str, random_options:bool) -> pd.DataFrame:
     # TEST SETTING: only use 10 first rows
     # context_df = context_df.head(10)
 
-    # create cartesian product of the two dataframes
-    task_df["key"] = 1  # temporary key for Cartesian product
-    context_df["key"] = 1
-    merged_df = pd.merge(task_df, context_df, on="key").drop("key", axis=1)
+    if context is None:
+        merged_df = task_df.copy()
+    else:
+        # create cartesian product of the two dataframes
+        task_df["key"] = 1  # temporary key for Cartesian product
+        context_df["key"] = 1
+        merged_df = pd.merge(task_df, context_df, on="key").drop("key", axis=1)
 
     def create_message_list(item, context):
         # set up new message containing the prompt
         prompt = create_prompt(task_name, item, random_options)
         message = {'content': prompt, 'role': 'user'}
         # add new message to conversation to create final chat
-        message_list = context.copy()
+        if context is None:
+            message_list = []
+        else: 
+            message_list = context.copy()
         message_list.append(message)
 
         return message_list
@@ -75,6 +84,8 @@ def create_df(context:str, task_name:str, random_options:bool) -> pd.DataFrame:
         merged_df["prompt"] = pd.Series([create_message_list(item, conversation) for (item, conversation) in zip(merged_df["item"], merged_df["conversation"])])
     elif context == "persona_hub":
         merged_df["prompt"] = pd.Series([create_message_list(item, persona) for (item, persona) in zip(merged_df["item"], merged_df["persona_prompt"])])
+    elif context == None:
+        merged_df["prompt"] = pd.Series([create_message_list(item, None) for item in merged_df["item"]])
     else:
         raise ValueError(f"{context} as context type is not allowed.")
 
