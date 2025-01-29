@@ -21,14 +21,16 @@ class Arguments:
     """
     Arguments needed to collect the data:
     - context data name
-    - task data name (scales/inventory or predicitve validity task) -> which data to load, which answer options to put into prompt, tpe of prompt in general (scale/inventory vs task)
+    - task data name (scales/inventory or predicitve validity task) -> which data to load, which answer options to put into prompt, type of prompt in general (scale/inventory vs task)
     - model id
-    - 
-    more?
+    - ouptut_dir
+    - random
+    
     """
 
-    context_data: str = field(
-        metadata={"help":"Name of the context data used. Options: 'chatbot_arena_conv', 'persona_hub'."}
+    context_data: Optional[str] = field(
+        default = None,
+        metadata={"help":"Name of the context data used. Options: None, 'chatbot_arena_conv', 'persona_hub'."}
     )
 
     task_data: str = field(
