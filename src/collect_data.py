@@ -1,6 +1,7 @@
 import os
 os.environ['HF_HOME'] = "/pfs/work7/workspace/scratch/ma_janjung-master-thesis"
 
+
 from transformers import HfArgumentParser
 from dataclasses import dataclass, field
 from typing import Optional
@@ -28,13 +29,13 @@ class Arguments:
     
     """
 
+    task_data: str = field(
+        metadata={"help":"Name of the task data used (scales/inventory name or predicitve validity task). Options: 'ASI', 'ASI_af', 'MSS'."}
+    )
+
     context_data: Optional[str] = field(
         default = None,
         metadata={"help":"Name of the context data used. Options: None, 'chatbot_arena_conv', 'persona_hub'."}
-    )
-
-    task_data: str = field(
-        metadata={"help":"Name of the task data used (scales/inventory name or predicitve validity task). Options: 'ASI', 'ASI_af', 'MSS'."}
     )
 
     model_id: Optional[str] = field(
