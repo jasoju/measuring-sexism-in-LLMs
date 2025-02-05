@@ -28,7 +28,7 @@ def setup_generator_pipe(model_id:str) -> transformers.TextGenerationPipeline:
         "text-generation",
         model=model,
         tokenizer=tokenizer,
-        max_new_tokens=128,
+        max_new_tokens=128
     )
 
     return generator
@@ -36,6 +36,6 @@ def setup_generator_pipe(model_id:str) -> transformers.TextGenerationPipeline:
 
 def run_inference(row:pd.Series, generator:transformers.TextGenerationPipeline) -> str:
     # get response from model
-    response = generator(row["prompt"])[0]["generated_text"][-1].get("content")
+    response = generator(row["prompt"], do_sample=False)[0]["generated_text"][-1].get("content")
 
     return response
