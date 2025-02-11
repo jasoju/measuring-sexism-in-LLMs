@@ -20,3 +20,8 @@ communal_words = [
     'babies', 'brothers', 'children', 'colleagues', 'dad', 'family', 'they', 'him', 'her', 'communication', 'conscientious', 'calm', 'compassionate', 'congenial',  'delightful', 
     'empathetic', 'friendly', 'gentle', 'honest', 'humble', 'spouse', 'thoughtful', 'well-liked'
 ]
+
+grindstone_words = [
+    'hardworking', 'conscientious', 'depend', 'meticulous', 'thorough', 'diligen', 'dedicate', 'careful', 'reliab', 'effort', 'assiduous', 'trust', 'responsib', 'methodical', 
+    'industrious', 'busy', 'work', 'persist', 'organiz', 'organis', 'disciplined'
+]
