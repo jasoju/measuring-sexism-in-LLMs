@@ -1,6 +1,9 @@
 import os
 os.environ['HF_HOME'] = "/pfs/work7/workspace/scratch/ma_janjung-master-thesis"
+os.environ['HF_TOKEN'] = "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"
 
+from huggingface_hub import login
+login("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")
 
 from transformers import HfArgumentParser
 from dataclasses import dataclass, field
@@ -30,7 +33,7 @@ class Arguments:
     """
 
     task_data: str = field(
-        metadata={"help":"Name of the task data used (scales/inventory name or predicitve validity task). Options: 'ASI', 'ASI_af', 'MSS'."}
+        metadata={"help":"Name of the task data used (scales/inventory name or predicitve validity task). Options: 'ASI', 'ASI_af', 'MSS', 'ref_letter_generation'."}
     )
 
     context_data: Optional[str] = field(
@@ -40,7 +43,7 @@ class Arguments:
 
     model_id: Optional[str] = field(
         default="mistralai/Mistral-7B-Instruct-v0.3",
-        metadata={"help":"Model_id from huggingface hub (e.g. cognitivecomputations/dolphin-2.8-mistral-7b-v02)"}
+        metadata={"help":"Model_id from huggingface hub (e.g. cognitivecomputations/dolphin-2.8-mistral-7b-v02, meta-llama/Llama-3.1-8B-Instruct)"}
     )
 
     output_dir: Optional[str] = field(
@@ -60,7 +63,7 @@ def collect_data():
     args = parser.parse_args_into_dataclasses()[0]
 
     # put together pandas dataframe containing the final prompts
-    df = create_df(args.context_data, args.task_data, args.random)
+    df = create_df(args.context_data, args.task_data, args.random, args.model_id)
     print("df ready")
 
     # set up generator 

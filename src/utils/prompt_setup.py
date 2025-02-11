@@ -50,11 +50,14 @@ def create_prompt(task_name:str|None,item: str, random_options:bool) -> str:
     return prompt
 
 
-def create_df(context:str|None, task_name:str, random_options:bool) -> pd.DataFrame:
+def create_df(context:str|None, task_name:str, random_options:bool, model_id:str) -> pd.DataFrame:
     # load task df
     task_df = load_df(task_name)
     # load context df
-    context_df = load_df(context)
+    if task_name =="ref_letters_generation":
+        context_df = load_df(f"{context}__subset__{model_id}")
+    else:
+        context_df = load_df(context)
     # TEST SETTING: only use 10 first rows
     # context_df = context_df.head(10)
 
