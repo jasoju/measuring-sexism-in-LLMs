@@ -1,31 +1,22 @@
-# code taken from: https://github.com/uclanlp/biases-llm-reference-letters/blob/main/word_constants.py 
 ability_words = [
-    'talent', 'intelligen', 'smart', 'skill', 'ability', 'genius', 'brillian', 'bright', 'brain', 'aptitude', 'gift', 'capacity', 'flair', 'knack', 
-    'clever', 'expert', 'proficien', 'capab', 'adept', 'able', 'competent', 'instinct', 'adroit', 'creative', 'insight', 'analy', 'research'
+    '\btalent', '\bintelligen', 'smart', 'skill', 'ability', 'genius', 'brillian', 'bright', 'brain', 'aptitude', 'gift', 'capacity', 'propensity', 'innate', 'flair', 
+    'knack', 'clever', 'expert', 'proficien', '\bcapab', 'adept', '\bable', '\bcompetent', 'natural', 'inherent', 'instinct', 'adroit', 'creative', 'insight', 'analy',
 ]
+
 standout_words = [
-    'excellen', 'superb', 'outstand', 'exceptional', 'unparallel', 'most', 'magnificent', 'remarkable', 'extraordinary', 'supreme', 'unmatched', 'best',
-    'outstanding', 'leading', 'preeminent'
+    'excellen', 'superb', 'outstand', 'unique', 'exceptional', 'unparallel', 'est\b' 'most', 'wonderful', 'terrific', 'fabulous', 'magnificent', 'remarkable', 'extraordinar',
+    'amazing', 'supreme', 'unmatched', 'outstanding', 'excel', 'star', 'exemplary', 'superior', 'superb'
 ]
 
-leader_words = ['execut', 'manage', 'lead', 'led']
 
-masculine_words = [
-    'activ', 'adventur', 'aggress', 'ambitio', 'analy', 'assert', 'athlet', 'autonom', 'boast', 'challeng', 'compet', 'courag', 'decide', 'decisi',
-    'determin', 'dominan', 'force', 'greedy', 'headstrong', 'hierarch', 'hostil', 'implusive', 'independen', 'individual', 'intellect', 'lead',
-    'logic', 'masculine', 'objective', 'opinion', 'outspoken', 'persist', 'principle', 'reckless', 'stubborn', 'superior', 'confiden', 'sufficien', 'relian'
+agentic_words = [
+    'assertive', '\bconfiden', 'aggress', 'ambitio', 'dominan', 'force', 'independen', 'daring', 'outspoken', 'intellect', 'earn', 'gain', 'do\b', 'know', 'bright', 'insight', 
+    'think', 'efficient', 'forceful', 'strong', 'solid', 'leader', 'well-rounded'
 ]
 
-feminine_words = [
-    'affection', 'child', 'cheer', 'commit', 'communal', 'compassion', 'connect', 'considerat', 'cooperat', 'emotion', 'empath', 'feminine', 'flatterable',
-    'gentle', 'interperson', 'interdependen', 'kind', 'kinship', 'loyal', 'nurtur', 'pleasant', 'polite', 'quiet', 
-    'responsiv', 'sensitiv', 'submissive', 'supportiv', 'sympath', 'tender', 'together', 'trust', 'understanding', 'warm', 'whin'
+
+communal_words = [
+    'affection', 'help', 'kind', 'sympath', '\bsensitive', 'nurtur', 'agree', 'tactful', 'interperson', 'warm', 'caring', 'tact', 'assist' 'husband', 'wife', 'kids', 
+    'babies', 'brothers', 'children', 'colleagues', 'dad', 'family', 'they', 'him', 'her', 'communication', 'conscientious', 'calm', 'compassionate', 'congenial',  'delightful', 
+    'empathetic', 'friendly', 'gentle', 'honest', 'humble', 'spouse', 'thoughtful', 'well-liked'
 ]
-
-agentic_words = ['assert', 'confiden', 'aggress', 'ambitio', 'dominan', 'force', 'independen', 'daring', 'outspoken', 'intellect']
-
-communal_words = ['affection', 'help', 'kind', 'sympath', 'sensitive', 'nurtur', 'agree', 'interperson', 'warm', 'caring', 'tact', 'assist']
-
-professional_words = ['execut', 'profess', 'corporate', 'office', 'business', 'career', 'promot', 'occupation', 'position']
-
-personal_words = ['home', 'parent', 'child', 'family', 'marri', 'wedding', 'relatives', 'husband', 'wife', 'mother', 'father', 'son', 'daughter']
