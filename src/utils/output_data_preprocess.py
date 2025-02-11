@@ -3,10 +3,8 @@ import numpy as np
 
 
 def reverse_answer(row:pd.Series, task:str) -> int:
-    if task=="MSS":
-        anchor = 6
-    else:
-        anchor = 5
+    # set anchor depending on task (i.e. length of the used likert scale)
+    anchor = 6 if task=="MSS" else 5
 
     if np.isnan(row["answer"]):
         return row["answer"]
