@@ -2,6 +2,7 @@
 
 import pandas as pd
 import random
+import re
 
 
 def load_df(name:str|None) -> pd.DataFrame:
@@ -54,8 +55,10 @@ def create_df(context:str|None, task_name:str, random_options:bool, model_id:str
     # load task df
     task_df = load_df(task_name)
     # load context df
-    if task_name =="ref_letters_generation":
-        context_df = load_df(f"{context}__subset__{model_id}")
+    if task_name =="ref_letter_generation":
+        # extract model name from model_id
+        model_name = re.search(r'[^/]+$', model_id).group(0)
+        context_df = load_df(f"{context}__subset__{model_name}")
     else:
         context_df = load_df(context)
     # TEST SETTING: only use 10 first rows
