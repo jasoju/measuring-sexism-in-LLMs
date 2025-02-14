@@ -1,5 +1,5 @@
 ---
-title: "Reliability & convergent validty"
+title: "Internal consistency"
 author: "Jana Jung"
 date: "15 1 2025"
 output: pdf_document
@@ -25,15 +25,20 @@ library(glue)
 
 ```{r}
 # load ASI data
-file_ASI <- "wide__Mistral-7B-Instruct-v0.3__persona_hub__ASI__2025-01-04_02-54"
+file_ASI <- "Mistral-7B-Instruct-v0.3__persona_hub__ASI__2025-02-07_23-32"
 
-# wide__dolphin-2.8-mistral-7b-v02__chatbot_arena_conv__ASI__2025-01-08_22-59
-# wide__dolphin-2.8-mistral-7b-v02__persona_hub__ASI__2025-01-21_01-02
-# wide__Mistral-7B-Instruct-v0.3__chatbot_arena_conv__ASI__2024-12-30_19-25
-# wide__Mistral-7B-Instruct-v0.3__persona_hub__ASI__2025-01-04_02-54
+############ ASI ############
+# dolphin-2.8-mistral-7b-v02__chatbot_arena_conv__ASI__2025-02-10_05-13
+# dolphin-2.8-mistral-7b-v02__persona_hub__ASI__2025-02-10_07-42
+
+# Llama-3.1-8B-Instruct__chatbot_arena_conv__ASI__2025-02-06_00-05
+# Llama-3.1-8B-Instruct__persona_hub__ASI__2025-02-07_11-05
+
+# Mistral-7B-Instruct-v0.3__chatbot_arena_conv__ASI__2025-02-07_09-21 
+# Mistral-7B-Instruct-v0.3__persona_hub__ASI__2025-02-07_23-32
 
 index <- "persona_id" # question_id / persona_id
-dir_ASI <- glue("output_data/wide/{file_ASI}.csv")
+dir_ASI <- glue("output_data/wide/wide__{file_ASI}.csv")
 
 ASI <- read.csv(dir_ASI, header=TRUE, row.names=index)
 ```
@@ -41,14 +46,19 @@ ASI <- read.csv(dir_ASI, header=TRUE, row.names=index)
 
 ```{r}
 # load MSS data
-file_MSS <- "wide__Mistral-7B-Instruct-v0.3__persona_hub__MSS__2025-01-18_06-51"
+file_MSS <- "Mistral-7B-Instruct-v0.3__persona_hub__MSS__2025-02-07_17-36"
 
-# wide__dolphin-2.8-mistral-7b-v02__chatbot_arena_conv__MSS__2025-01-10_22-50
-# wide__dolphin-2.8-mistral-7b-v02__persona_hub__MSS__2025-01-10_20-49
-# wide__Mistral-7B-Instruct-v0.3__chatbot_arena_conv__MSS__2025-01-18_01-28
-# wide__Mistral-7B-Instruct-v0.3__persona_hub__MSS__2025-01-18_06-51
+############ MSS ############
+# dolphin-2.8-mistral-7b-v02__chatbot_arena_conv__MSS__2025-02-09_22-34
+# dolphin-2.8-mistral-7b-v02__persona_hub__MSS__2025-02-09_22-41
 
-dir_MSS <- glue("output_data/wide/{file_MSS}.csv")
+# Llama-3.1-8B-Instruct__chatbot_arena_conv__MSS__2025-02-07_23-00
+# Llama-3.1-8B-Instruct__persona_hub__MSS__2025-02-07_22-12
+
+# Mistral-7B-Instruct-v0.3__chatbot_arena_conv__MSS__2025-02-07_19-47
+# Mistral-7B-Instruct-v0.3__persona_hub__MSS__2025-02-07_17-36
+
+dir_MSS <- glue("output_data/wide/wide__{file_MSS}.csv")
 
 MSS <- read.csv(dir_MSS, header=TRUE, row.names=index) # uses same index as ASI
 ```
@@ -56,8 +66,8 @@ MSS <- read.csv(dir_MSS, header=TRUE, row.names=index) # uses same index as ASI
 
 ```{r}
 # only select columns with variance > 0 (needed for omega calculation)
-ASI_filtered <- ASI[, apply(ASI, 2, var) > 0]
-MSS_filtered <- MSS[, apply(MSS, 2, var) > 0]
+ASI_filtered <- ASI[, apply(ASI, 2, var, na.rm = TRUE) > 0]
+MSS_filtered <- MSS[, apply(MSS, 2, var, na.rm = TRUE) > 0]
 
 ```
 
@@ -70,7 +80,7 @@ MSS_filtered <- MSS[, apply(MSS, 2, var) > 0]
 
 ```{r}
 # define item strata
-itemstrata <- rbind(c("X1","B"),
+itemstrata_ASI <- rbind(c("X1","B"),
                     c("X2","H"),
                     c("X3","B"),
                     c("X4","H"),
@@ -94,7 +104,8 @@ itemstrata <- rbind(c("X1","B"),
                     c("X22","B")
                     )
 
-stratified.cronbach.alpha(ASI, itemstrata = itemstrata)
+# calculate stratified Cronbach's alpha
+stratified.cronbach.alpha(ASI, itemstrata = itemstrata_ASI)
 ```
 
 
@@ -103,6 +114,10 @@ stratified.cronbach.alpha(ASI, itemstrata = itemstrata)
 ```{r}
 omega(ASI_filtered, flip = FALSE)
 ```
+
+
+
+
 
 ## MSS
 
