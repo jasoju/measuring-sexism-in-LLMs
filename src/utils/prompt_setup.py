@@ -13,7 +13,7 @@ def load_df(name:str|None) -> pd.DataFrame:
     return df
 
 
-def create_prompt(task_name:str|None,item: str, random_options:bool) -> str:
+def create_prompt(task_name:str|None,item: str, reverse_options:bool) -> str:
     if task_name == "ref_letter_generation":
         return item
     elif task_name == "MSS":
@@ -34,9 +34,9 @@ def create_prompt(task_name:str|None,item: str, random_options:bool) -> str:
             "5 agree strongly",
         ]
 
-    # shuffle the answer options if random == True
-    if random_options:
-        random.shuffle(answer_options)
+    # shuffle the answer options if reverse == True
+    if reverse_options:
+        answer_options = reversed(answer_options)
     options_str = "\n ".join(answer_options)
 
     # create the prompt
@@ -51,7 +51,7 @@ def create_prompt(task_name:str|None,item: str, random_options:bool) -> str:
     return prompt
 
 
-def create_df(context:str|None, task_name:str, random_options:bool, model_id:str) -> pd.DataFrame:
+def create_df(context:str|None, task_name:str, reverse_options:bool, model_id:str) -> pd.DataFrame:
     # load task df
     task_df = load_df(task_name)
     # load context df
@@ -74,7 +74,7 @@ def create_df(context:str|None, task_name:str, random_options:bool, model_id:str
 
     def create_message_list(item, context):
         # set up new message containing the prompt
-        prompt = create_prompt(task_name, item, random_options)
+        prompt = create_prompt(task_name, item, reverse_options)
         message = {'content': prompt, 'role': 'user'}
         # add new message to conversation to create final chat
         if context is None:
