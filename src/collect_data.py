@@ -1,5 +1,9 @@
 import os
 os.environ['HF_HOME'] = "/pfs/work7/workspace/scratch/ma_janjung-master-thesis"
+os.environ['HF_TOKEN'] = "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"
+
+from huggingface_hub import login
+login("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")
 
 from transformers import HfArgumentParser
 from dataclasses import dataclass, field
@@ -25,7 +29,6 @@ class Arguments:
     - model id
     - ouptut_dir
     - random
-    
     """
 
     task_data: str = field(
@@ -39,7 +42,7 @@ class Arguments:
 
     model_id: Optional[str] = field(
         default="mistralai/Mistral-7B-Instruct-v0.3",
-        metadata={"help":"Model_id from huggingface hub (e.g. cognitivecomputations/dolphin-2.8-mistral-7b-v02, meta-llama/Llama-3.1-8B-Instruct)"}
+        metadata={"help":"Model_id from huggingface hub (e.g. cognitivecomputations/dolphin-2.8-mistral-7b-v02, meta-llama/Llama-3.1-8B-Instruct, deepseek-ai/deepseek-llm-7b-chat)"}
     )
 
     output_dir: Optional[str] = field(
@@ -63,7 +66,7 @@ def collect_data():
     print("df ready")
 
     # set up generator 
-    generator = setup_generator_pipe(args.model_id)
+    generator = setup_generator_pipe(args.model_id, args.task_data)
     print("generator ready")
 
     # run inference to get responses
