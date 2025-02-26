@@ -1,9 +1,5 @@
 import os
 os.environ['HF_HOME'] = "/pfs/work7/workspace/scratch/ma_janjung-master-thesis"
-os.environ['HF_TOKEN'] = "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"
-
-from huggingface_hub import login
-login("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")
 
 from transformers import HfArgumentParser
 from dataclasses import dataclass, field
@@ -50,9 +46,9 @@ class Arguments:
         default="output_data"
     )
 
-    reverse: Optional[bool] = field(
+    random: Optional[bool] = field(
         default=False,
-        metadata={"help":"Indicating if the order of answer options is reversed."}
+        metadata={"help":"Indicating if the answer options are shuffled randomly."}
     )
 
 
@@ -63,11 +59,11 @@ def collect_data():
     args = parser.parse_args_into_dataclasses()[0]
 
     # put together pandas dataframe containing the final prompts
-    df = create_df(args.context_data, args.task_data, args.reverse, args.model_id)
+    df = create_df(args.context_data, args.task_data, args.random, args.model_id)
     print("df ready")
 
     # set up generator 
-    generator = setup_generator_pipe(args.model_id, args.task_data)
+    generator = setup_generator_pipe(args.model_id)
     print("generator ready")
 
     # run inference to get responses
