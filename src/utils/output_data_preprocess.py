@@ -23,8 +23,8 @@ def get_file_vars(file:str):
             model_name = "Dolphin 2.8 Mistral 7B v0.2"
             model_id = "dolphin-2.8-mistral-7b-v02"
         else:
-            model_name = "Dolphin 2.9.4 Llama 3.1 8B"
-            model_id = "dolphin-2.9.4-llama3.1-8b" 
+            model_name = "Dolphin 3.0 Llama 3.1 8B"
+            model_id = "Dolphin3.0-Llama3.1-8B" 
     elif "deepseek" in file.lower():
         model_name = "DeepSeek R1 Distill Llama 8B"
         model_id = "DeepSeek-R1-Distill-Llama-8B"
