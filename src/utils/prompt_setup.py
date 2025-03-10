@@ -86,12 +86,12 @@ def create_df(context:str|None, task_name:str, random_options:bool, model_id:str
         return message_list
     
     # apply create message list function to every row (input columns depend on context type)
-    if "chatbot_arena_conv" in context:
+    if context == None:
+        merged_df["prompt"] = pd.Series([create_message_list(item, None) for item in merged_df["item"]])
+    elif "chatbot_arena_conv" in context:
         merged_df["prompt"] = pd.Series([create_message_list(item, conversation) for (item, conversation) in zip(merged_df["item"], merged_df["conversation"])])
     elif context == "persona_hub":
         merged_df["prompt"] = pd.Series([create_message_list(item, persona) for (item, persona) in zip(merged_df["item"], merged_df["persona_prompt"])])
-    elif context == None:
-        merged_df["prompt"] = pd.Series([create_message_list(item, None) for item in merged_df["item"]])
     else:
         raise ValueError(f"{context} as context type is not allowed.")
 
