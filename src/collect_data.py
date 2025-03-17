@@ -42,7 +42,7 @@ class Arguments:
 
     model_id: Optional[str] = field(
         default="mistralai/Mistral-7B-Instruct-v0.3",
-        metadata={"help":"Model_id from huggingface hub (e.g. cognitivecomputations/dolphin-2.8-mistral-7b-v02, meta-llama/Llama-3.1-8B-Instruct, deepseek-ai/deepseek-llm-7b-chat)"}
+        metadata={"help":"Model_id from huggingface hub (e.g. cognitivecomputations/dolphin-2.8-mistral-7b-v02, meta-llama/Llama-3.1-8B-Instruct, cognitivecomputations/Dolphin3.0-Llama3.1-8B, Qwen/Qwen2.5-7B-Instruct, meta-llama/Llama-3.3-70B-Instruct)"}
     )
 
     output_dir: Optional[str] = field(

@@ -10,6 +10,8 @@ from tqdm import tqdm
 def setup_generator_pipe(model_id:str, task:str) -> transformers.TextGenerationPipeline:
     # set max_new_tokens based on task
     max_new_tokens = 600 if task == "ref_letter_generation" else 128
+    if model_id == "meta-llama/Llama-3.3-70B-Instruct":
+        max_new_tokens = 10 
     
     # set up generator pipeline
     bnb_config = BitsAndBytesConfig(
