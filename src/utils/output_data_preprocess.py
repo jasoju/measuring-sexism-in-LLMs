@@ -28,9 +28,15 @@ def get_file_vars(file:str):
     elif "deepseek" in file.lower():
         model_name = "DeepSeek R1 Distill Llama 8B"
         model_id = "DeepSeek-R1-Distill-Llama-8B"
-    elif "llama" in file.lower():
+    elif "llama-3.1-8b" in file.lower():
         model_name = "Llama 3.1 8B Instruct"
         model_id = "Llama-3.1-8B-Instruct"
+    elif "llama-3.3-70b" in file.lower():
+        model_name = "Llama 3.3 70B Instruct"
+        model_id = "Llama-3.3-70B-Instruct"
+    elif "qwen" in file.lower():
+        model_name = "Qwen 2.5 7B Instruct"
+        model_id = "Qwen2.5-7B-Instruct"
     else: 
         model_name = "Mistral 7B Instruct v0.3"
         model_id = "Mistral-7B-Instruct-v0.3"
