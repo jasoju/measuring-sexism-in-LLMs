@@ -25,7 +25,7 @@ library(glue)
 
 ```{r}
 # load ASI data
-file_ASI <- "Dolphin3.0-Llama3.1-8B__persona_hub__ASI__2025-03-07_14-39"
+file_ASI <- "Qwen2.5-7B-Instruct__chatbot_arena_conv__ASI__2025-03-17_13-55"
 
 ############ ASI ############
 # Dolphin3.0-Llama3.1-8B__chatbot_arena_conv__ASI__2025-03-07_12-26
@@ -37,10 +37,16 @@ file_ASI <- "Dolphin3.0-Llama3.1-8B__persona_hub__ASI__2025-03-07_14-39"
 # Llama-3.1-8B-Instruct__chatbot_arena_conv__ASI__2025-02-06_00-05
 # Llama-3.1-8B-Instruct__persona_hub__ASI__2025-02-07_11-05
 
+# Llama-3.3-70B-Instruct__chatbot_arena_conv__ASI__2025-03-17_14-29
+# Llama-3.3-70B-Instruct__persona_hub__ASI__2025-03-17_17-54
+
 # Mistral-7B-Instruct-v0.3__chatbot_arena_conv__ASI__2025-02-07_09-21 
 # Mistral-7B-Instruct-v0.3__persona_hub__ASI__2025-02-07_23-32
 
-index <- "persona_id" # question_id / persona_id
+# Qwen2.5-7B-Instruct__chatbot_arena_conv__ASI__2025-03-17_13-55
+# Qwen2.5-7B-Instruct__persona_hub__ASI__2025-03-17_18-51
+
+index <- "question_id" # question_id / persona_id
 dir_ASI <- glue("output_data/wide/wide__{file_ASI}.csv")
 
 ASI <- read.csv(dir_ASI, header=TRUE, row.names=index)
