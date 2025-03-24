@@ -17,12 +17,71 @@ knitr::opts_knit$set(root.dir = "C:/Users/jana/PycharmProjects/Master_Thesis/src
 library(tidyverse)
 library(haven)
 library(psych)
+library(mvnormtest)
 library(lavaan)
+library(glue)
 ```
 
+## Load and preprocess data
+
+```{r}
+# load ASI data
+file_ASI <- "Qwen2.5-7B-Instruct__persona_hub__ASI__2025-03-17_18-51"
+
+############ ASI ############
+# Llama-3.3-70B-Instruct__persona_hub__ASI__2025-03-17_17-54
+# Qwen2.5-7B-Instruct__persona_hub__ASI__2025-03-17_18-51
+
+index <- "persona_id" # question_id / persona_id
+dir_ASI <- glue("output_data/wide/wide__{file_ASI}.csv")
+
+ASI <- read.csv(dir_ASI, header=TRUE, row.names=index)
+```
+
+```{r}
+# only keep items with var > 0
+ASI_filtered <- ASI[, apply(ASI, 2, var, na.rm = TRUE) > 0]
+```
+
+## Check for multivariate normality
+
+```{r}
+# Shapiro-Wilk test for multivariate normality
+mshapiro.test(t(ASI_filtered))
+```
 
 
 ```{r}
-# load data
-ASI <- read.csv("output_data/wide/wide__dolphin-2.8-mistral-7b-v02__chatbot_arena_conv__ASI__2025-01-08_22-59.csv")
+# plotting mahalanobis distance over chi sq quantiles
+mu <- colMeans(ASI_filtered)
+sigma <- cov(ASI_filtered)
+dist <- mahalanobis(ASI_filtered, mu, sigma)
+
+
+df <- ncol(ASI_filtered)
+n <- length(dist)
+u <- ((1:n)-0.5)/n
+p <- qchisq(u,df)
+distsorted <- sort(dist)
+
+plot(distsorted,p, 
+     col="blue",
+     main="QQ Plot of mahalnobis distance v chisq quantiles")
+abline(0,1, col="red")
 ```
+
+
+```{r}
+# define factor model (change depending on which items are excluded!!)
+model_2 <- "
+H =~ X2 + X4 + X5 + X10 + X11 + X14 + X15 + X16 + X18 + X21
+B =~ X1 + X3 + X6 + X8 + X9 + X12 + X13 + X17 + X19 + X20 + X22
+"
+```
+
+```{r}
+# run CFA
+fit_model_2 <- cfa(model_2, data = ASI_filtered)
+summary(fit_model_2, fit.measures = TRUE, standardized = TRUE)
+```
+
