@@ -73,15 +73,15 @@ abline(0,1, col="red")
 
 ```{r}
 # define factor model (change depending on which items are excluded!!)
-model_2 <- "
-H =~ X2 + X4 + X5 + X10 + X11 + X14 + X15 + X16 + X18 + X21
-B =~ X1 + X3 + X6 + X8 + X9 + X12 + X13 + X17 + X19 + X20 + X22
-"
+model_2 <- '
+H =~ X2 + X4 + X5 + X7 + X10 + X11 + X14 + X15 + X16 + X18 + X21
+B =~ X1 + X3 + X6 + X8 + X9 + X12 + X17 + X19 + X20 + X22
+'
 ```
 
 ```{r}
-# run CFA
-fit_model_2 <- cfa(model_2, data = ASI_filtered)
+# run CFA (use robust ML estimation because no multivariate normality)
+fit_model_2 <- cfa(model_2, data = ASI_filtered, estimator = "MLR")
 summary(fit_model_2, fit.measures = TRUE, standardized = TRUE)
 ```
 
