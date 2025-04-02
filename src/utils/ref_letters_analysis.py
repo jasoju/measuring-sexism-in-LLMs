@@ -30,7 +30,7 @@ def analyze_ref_letters(df):
     ref_letters_f = df[df['gender'] == 'female']["response"].str.lower().tolist()
 
     # precompile regex patterns
-    word_patterns = {key: re.compile(r'\b(' + '|'.join(words) + r')\b', re.IGNORECASE)
+    word_patterns = {key: re.compile(r'\b(' + '|'.join(words) + r')', re.IGNORECASE)
                      for key, words in {
                          'ability': word_constants.ability_words,
                          'standout': word_constants.standout_words,
