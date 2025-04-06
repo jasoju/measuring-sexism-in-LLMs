@@ -166,3 +166,5 @@ slurm_scripts/
 src/data/dump/
 src/analyses/.Rhistory
 .vscode/
+proposal/
+src/preparation/update_df.ipynb
