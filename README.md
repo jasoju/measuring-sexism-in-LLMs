@@ -1,6 +1,6 @@
 # Measuring ambivalent sexism in large language models: A validation study
 
-In this master thesis project, I aim to systematically validate the Ambivalent Sexism Inventory for LLMs by evaluating reliablilty - through internal consistency, alternate-form reliability, and option-order symmtery - and validity - through concurrent validity, convergent validity, and factorial validity.
+In this master thesis project, I aim to systematically validate the Ambivalent Sexism Inventory for LLMs by evaluating reliability - through internal consistency, alternate-form reliability, and option-order symmtery - and validity - through concurrent validity, convergent validity, and factorial validity.
 
 [collect_data.py](src/collect_data.py) is used to collect model responses to different tasks. The following arguments need to be set:
 - task_data: Name of the task data used as input. Options: 'ASI', 'ASI_af', 'MSS', 'ref_letter_generation'
