@@ -1,0 +1,16 @@
+This template uses the CSSHThesis class for all layout settings.
+Do not touch the file CSSHThesis.cls!
+You can make personal configurations within the template.tex file.
+
+Be aware of the line "\overfullrule=2cm ". 
+This shows a black box at the end a line that exceeds the textwidth
+and indicates you should either add a hypenation to the section above this line,
+or otherwise change something else to comply with the textwidth. 
+Be sure to uncomment this line before compiling your final version, 
+since often in the bibliography section some citations exceed the
+text limit as well. 
+
+The template requires the installation of following additional packages:
+* biblatex (for the bibliography backend)
+* texlive-latex-extra 
+* texlive-fonts-extra
