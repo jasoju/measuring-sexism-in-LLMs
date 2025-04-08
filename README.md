@@ -16,4 +16,4 @@ For all conducted analyses, a jupyter notebook can be found [here](src/analyses/
 - one file for each psychometric quality criterion assessment (named accordingly)
 - [a file](src/analyses/sexist_convs.ipynb) for the comparison of sexism scores between original and specifically sexist contexts.
 
-  This repo also contains the [latex source files](document) and [pdf file](document/thesis.pdf) of my thesis.
+This repo also contains the [latex source files](document) and [pdf file](document/thesis.pdf) of my thesis.
