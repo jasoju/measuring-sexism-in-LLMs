@@ -2,7 +2,7 @@
 
 In this project, I aim to systematically validate the Ambivalent Sexism Inventory for LLMs by evaluating reliablilty - through internal consistency, alternate-form reliability, and option-order symmtery - and validity - through concurrent validity, convergent validity, and factorial validity.
 
-[collect_data.py](src/collext_data.py) is used to collect model responses to different tasks. The following arguments need to be set:
+[collect_data.py](src/collect_data.py) is used to collect model responses to different tasks. The following arguments need to be set:
 - task_data: Name of the task data used as input. Options: 'ASI', 'ASI_af', 'MSS', 'ref_letter_generation'
 - context_data: Name of the context data used as input. Options: None, 'chatbot_arena_conv', 'persona_hub'. 'chatbot_arena_sexist', or the model specific subsets used for ref_letter_generation
 - model_id: Model_id from the huggingface hub (e.g. meta-llama/Llama-3.3-70B-Instruct)
