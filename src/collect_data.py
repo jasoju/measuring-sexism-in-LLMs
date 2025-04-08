@@ -1,10 +1,3 @@
-import os
-os.environ['HF_HOME'] = "/pfs/work7/workspace/scratch/ma_janjung-master-thesis"
-os.environ['HF_TOKEN'] = "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"
-
-from huggingface_hub import login
-login("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")
-
 from transformers import HfArgumentParser
 from dataclasses import dataclass, field
 from typing import Optional
