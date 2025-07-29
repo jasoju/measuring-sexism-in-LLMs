@@ -12,6 +12,10 @@ def get_file_vars(file:str):
         context_var = "question_id"
         context_name = "Chatbot Arena"
         context_file = "chatbot_arena_conv"
+    elif "random" in file:
+        context_var = "random_state"
+        context_name = "Random State"
+        context_file = "random_state"
     else:
         context_var = None
         context_name = None
