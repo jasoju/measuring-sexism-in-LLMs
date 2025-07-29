@@ -1,6 +1,6 @@
 # load modules
 import transformers
-from transformers import AutoTokenizer, AutoModelForCausalLM, BitsAndBytesConfig, pipeline
+from transformers import AutoTokenizer, AutoModelForCausalLM, BitsAndBytesConfig, pipeline, set_seed
 from datasets import Dataset
 import torch
 import pandas as pd
@@ -39,6 +39,10 @@ def setup_generator_pipe(model_id:str, task:str) -> transformers.TextGenerationP
 
 def run_inference(row:pd.Series, generator:transformers.TextGenerationPipeline) -> str:
     # get response from model
-    response = generator(row["prompt"], do_sample=False)[0]["generated_text"][-1].get("content")
+    if "random_state" in row:
+        set_seed(row["random_state"])
+        response = generator(row["prompt"], do_sample=True)[0]["generated_text"][-1].get("content")
+    else:
+        response = generator(row["prompt"], do_sample=False)[0]["generated_text"][-1].get("content")
 
     return response

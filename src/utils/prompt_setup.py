@@ -85,7 +85,7 @@ def create_df(context:str|None, task_name:str, random_options:bool, model_id:str
         return message_list
     
     # apply create message list function to every row (input columns depend on context type)
-    if context == None:
+    if context is None or context == "random_state":
         merged_df["prompt"] = pd.Series([create_message_list(item, None) for item in merged_df["item"]])
     elif "chatbot_arena_conv" in context:
         merged_df["prompt"] = pd.Series([create_message_list(item, conversation) for (item, conversation) in zip(merged_df["item"], merged_df["conversation"])])

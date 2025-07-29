@@ -17,7 +17,7 @@ from utils.model_inference import setup_generator_pipe, run_inference
 class Arguments:
     """
     Arguments needed to collect the data:
-    - context data name
+    - method of inducing individuals
     - task data name (scales/inventory or predicitve validity task) -> which data to load, which answer options to put into prompt, type of prompt in general (scale/inventory vs task)
     - model id
     - ouptut_dir
@@ -28,9 +28,9 @@ class Arguments:
         metadata={"help":"Name of the task data used (scales/inventory name or predicitve validity task). Options: 'ASI', 'ASI_af', 'MSS', 'ref_letter_generation'."}
     )
 
-    context_data: Optional[str] = field(
+    individuals: Optional[str] = field(
         default = None,
-        metadata={"help":"Name of the context data used. Options: None, 'chatbot_arena_conv', 'persona_hub'."}
+        metadata={"help":"Name of the data/method used to induce individuals. Options: None, 'chatbot_arena_conv', 'persona_hub', 'random_state'."}
     )
 
     model_id: Optional[str] = field(
@@ -55,7 +55,7 @@ def collect_data():
     args = parser.parse_args_into_dataclasses()[0]
 
     # put together pandas dataframe containing the final prompts
-    df = create_df(args.context_data, args.task_data, args.random, args.model_id)
+    df = create_df(args.individuals, args.task_data, args.random, args.model_id)
     print("df ready")
 
     # set up generator 
@@ -80,11 +80,11 @@ def collect_data():
     # extract model name from model_id
     model_name = re.search(r'[^/]+$', args.model_id).group(0)
 
-    file_name = f"{model_name}__{args.context_data}__{args.task_data}__{dt_string}.json"
+    file_name = f"{model_name}__{args.individuals}__{args.task_data}__{dt_string}.json"
     # save completed df in output dir
     output_dir_file = os.path.join(args.output_dir, file_name)
     df.to_json(output_dir_file)
 
 if __name__== "__main__":
-    # sample run: python collect_data.py --context_data chatbot_arena_conv --task_data ASI
+    # sample run: python collect_data.py --individuals chatbot_arena_conv --task_data ASI
     collect_data()
