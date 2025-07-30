@@ -170,3 +170,4 @@ proposal/
 src/preparation/update_df.ipynb
 figures/
 tables/
+tests/
