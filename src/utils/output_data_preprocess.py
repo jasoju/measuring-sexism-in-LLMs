@@ -12,7 +12,7 @@ def get_file_vars(file:str):
         context_var = "question_id"
         context_name = "Chatbot Arena"
         context_file = "chatbot_arena_conv"
-    elif "random" in file:
+    elif "random_state" in file:
         context_var = "random_state"
         context_name = "Random State"
         context_file = "random_state"
@@ -50,7 +50,7 @@ def get_file_vars(file:str):
         task = "MSS"
     elif "ASI_af" in file:
         task = "ASI_af"
-    elif "random" in file:
+    elif "ASI_random" in file:
         task = "ASI_random"
     else:
         task = "ASI"
