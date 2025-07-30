@@ -168,3 +168,5 @@ src/analyses/.Rhistory
 .vscode/
 proposal/
 src/preparation/update_df.ipynb
+figures/
+tables/
