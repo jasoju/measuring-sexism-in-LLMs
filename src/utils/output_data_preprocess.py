@@ -50,7 +50,7 @@ def get_file_vars(file:str):
         task = "MSS"
     elif "ASI_af" in file:
         task = "ASI_af"
-    elif "ASI_random" in file:
+    elif "ASI__random" in file:
         task = "ASI_random"
     else:
         task = "ASI"
