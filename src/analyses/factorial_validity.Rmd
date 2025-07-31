@@ -7,7 +7,7 @@ output: pdf_document
 
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = TRUE)
-knitr::opts_knit$set(root.dir = "C:/Users/jana/PycharmProjects/Master_Thesis/src")
+knitr::opts_knit$set(root.dir = "C:/Users/jana/Documents/Repos/measuring-sexism-in-LLMs/src")
 ```
 
 
@@ -30,10 +30,11 @@ library(lavaanPlot)
 file_ASI <- "Qwen2.5-7B-Instruct__persona_hub__ASI__2025-03-17_18-51"
 
 ############ ASI ############
+# dolphin-2.8-mistral-7b-v02__random_state__ASI__2025-07-30_19-53
 # Llama-3.3-70B-Instruct__persona_hub__ASI__2025-03-17_17-54
 # Qwen2.5-7B-Instruct__persona_hub__ASI__2025-03-17_18-51
 
-index <- "persona_id" # question_id / persona_id
+index <- "persona_id" # persona_id / random_state
 dir_ASI <- glue("output_data/wide/wide__{file_ASI}.csv")
 
 ASI <- read.csv(dir_ASI, header=TRUE, row.names=index)
@@ -78,6 +79,8 @@ model_2 <- '
 H =~ X2 + X4 + X5 + X7 + X10 + X11 + X14 + X15 + X16 + X18 + X21
 B =~ X1 + X3 + X6 + X8 + X9 + X12 + X17 + X19 + X20 + X22
 '
+# LLama: delete X7 (H)
+# Qwen: delete X13 (B)
 
 # delete reverse-coded items (does not make a difference)
 #model_2 <- '

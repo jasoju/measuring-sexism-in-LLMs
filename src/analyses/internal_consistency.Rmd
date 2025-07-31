@@ -7,7 +7,8 @@ output: pdf_document
 
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = TRUE)
-knitr::opts_knit$set(root.dir = "C:/Users/jana/PycharmProjects/Master_Thesis/src")
+knitr::opts_knit$set(root.dir = "C:/Users/jana/Documents/Repos/measuring-sexism-in-LLMs/src")
+
 ```
 
 
@@ -25,28 +26,34 @@ library(glue)
 
 ```{r}
 # load ASI data
-file_ASI <- "Qwen2.5-7B-Instruct__chatbot_arena_conv__ASI__2025-03-17_13-55"
+file_ASI <- "Qwen2.5-7B-Instruct__random_state__ASI__2025-07-31_10-08"
 
 ############ ASI ############
 # Dolphin3.0-Llama3.1-8B__chatbot_arena_conv__ASI__2025-03-07_12-26
 # Dolphin3.0-Llama3.1-8B__persona_hub__ASI__2025-03-07_14-39
+# Dolphin3.0-Llama3.1-8B__random_state__ASI__2025-07-31_09-55
 
 # dolphin-2.8-mistral-7b-v02__chatbot_arena_conv__ASI__2025-02-10_05-13
 # dolphin-2.8-mistral-7b-v02__persona_hub__ASI__2025-02-10_07-42
+# dolphin-2.8-mistral-7b-v02__random_state__ASI__2025-07-30_19-53
 
 # Llama-3.1-8B-Instruct__chatbot_arena_conv__ASI__2025-02-06_00-05
 # Llama-3.1-8B-Instruct__persona_hub__ASI__2025-02-07_11-05
+# Llama-3.1-8B-Instruct__random_state__ASI__2025-07-30_20-09
 
 # Llama-3.3-70B-Instruct__chatbot_arena_conv__ASI__2025-03-17_14-29
 # Llama-3.3-70B-Instruct__persona_hub__ASI__2025-03-17_17-54
+# Llama-3.3-70B-Instruct__random_state__ASI__2025-07-31_12-36
 
 # Mistral-7B-Instruct-v0.3__chatbot_arena_conv__ASI__2025-02-07_09-21 
 # Mistral-7B-Instruct-v0.3__persona_hub__ASI__2025-02-07_23-32
+# Mistral-7B-Instruct-v0.3__random_state__ASI__2025-07-30_12-40
 
 # Qwen2.5-7B-Instruct__chatbot_arena_conv__ASI__2025-03-17_13-55
 # Qwen2.5-7B-Instruct__persona_hub__ASI__2025-03-17_18-51
+# Qwen2.5-7B-Instruct__random_state__ASI__2025-07-31_10-08
 
-index <- "question_id" # question_id / persona_id
+index <- "random_state" # question_id / persona_id/random_state
 dir_ASI <- glue("output_data/wide/wide__{file_ASI}.csv")
 
 ASI <- read.csv(dir_ASI, header=TRUE, row.names=index)
@@ -77,9 +84,9 @@ MSS <- read.csv(dir_MSS, header=TRUE, row.names=index) # uses same index as ASI
 
 
 ```{r}
-# only select columns with variance > 0 (needed for omega calculation)
+# only select columns with variance > 0 (only used for omega calculation)
 ASI_filtered <- ASI[, apply(ASI, 2, var, na.rm = TRUE) > 0]
-MSS_filtered <- MSS[, apply(MSS, 2, var, na.rm = TRUE) > 0]
+# MSS_filtered <- MSS[, apply(MSS, 2, var, na.rm = TRUE) > 0]
 
 ```
 
