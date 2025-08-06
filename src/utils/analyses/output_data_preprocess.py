@@ -81,3 +81,25 @@ def sample_from_quartiles(df:pd.DataFrame, quartiles:list, col="total", n=10):
     # returns one list containing all identifiers (question_id or persona_id) of the sampled contexts
     return sampled_indices
 
+
+def calculate_scores(df_wide:pd.DataFrame, test:str):
+    # MSS
+    if test == "MSS":
+        df_scores = pd.DataFrame({
+        "total": df_wide.mean(axis=1)
+        })
+
+    # ASI
+    else:
+        # assign ASI items to AS dimensions
+        h_items = [2, 4, 5, 7, 10, 11, 14, 15, 16, 18, 21]
+        b_items = [1, 3, 6, 8, 9, 12, 13, 17, 19, 20, 22]
+        # calculate score values
+        df_scores = pd.DataFrame({
+            "total": df_wide.mean(axis=1),
+            "HS": df_wide[h_items].mean(axis=1),
+            "BS": df_wide[b_items].mean(axis=1)
+        })
+
+    return df_scores
+
