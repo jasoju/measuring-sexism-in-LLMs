@@ -8,8 +8,12 @@ import pandas as pd
 from tqdm import tqdm
 from datetime import datetime
 import re
+import json
 
 from utils.data_collection.collect_data import collect_data
+from utils.analyses.descriptives import get_descriptives
+from utils.analyses.internal_consistency import calc_alpha
+from utils.analyses.score_corr import calc_score_corr
 
 
 # dataclass that contains all arguments needed
@@ -42,7 +46,6 @@ class Arguments:
 
 # main function that performs one run
 def main():
-
     parser = HfArgumentParser(Arguments)
     args = parser.parse_args_into_dataclasses()[0]
 
@@ -61,25 +64,51 @@ def main():
     else:
         os.makedirs(final_directory)
 
+    # first collect data without inducing individuals and get mean score of model
+    no_individuals = collect_data(task_data=args.task, 
+                                  individuals=None, 
+                                  model_id=args.model_id, 
+                                  output_dir=final_directory, 
+                                  random=False)
+    # get descriptives (function automatically saves a json with results when using no individuals)
+    get_descriptives(df=no_individuals, model_name=model_name, test=args.test, individuals=None, output_dir=final_directory)
     
     # for all types of individuals in individuals_list collect data and run analyses
     for individuals in args.individuals_list:
         # standard
-        standard = collect_data(task_data=args.task, individuals=individuals, model_id=args.model_id, output_dir=final_directory, random=False)
+        standard = collect_data(task_data=args.task, 
+                                individuals=individuals, 
+                                model_id=args.model_id, 
+                                output_dir=final_directory, 
+                                random=False)
         # alternate form
-        af = collect_data(task_data=f"{args.task}_af", individuals=individuals, model_id=args.model_id, output_dir=final_directory, random=False)
+        af = collect_data(task_data=f"{args.task}_af", 
+                          individuals=individuals, 
+                          model_id=args.model_id, 
+                          output_dir=final_directory, 
+                          random=False)
         # random order of answer options
-        random = collect_data(task_data=args.task, individuals=individuals, model_id=args.model_id, output_dir=final_directory, random=True)
+        random = collect_data(task_data=args.task, 
+                              individuals=individuals, 
+                              model_id=args.model_id, 
+                              output_dir=final_directory, 
+                              random=True)
 
         # call functions for analyses
+        sub_directory = os.path.join(final_directory, f"{individuals}")
         # descriptives
-        get_descriptives(standard)
+        results_desc = get_descriptives(df=standard, model_name=model_name, test=args.test, individuals=individuals, output_dir=sub_directory)
         # internal consistency
-        eval_internal_consistency(standard)
+        results_ic = calc_alpha(df=standard)
         # alternate form reliability
-        eval_af_reliability(standard, af)
+        results_af = calc_score_corr(df1=standard, df2=af, eval="af_reliability")
         # option order symmetry
-        eval_option_order_symmetry(standard, random)
+        results_oos = calc_score_corr(df1=standard, df2=random, eval="option_order_sym")
+
+        # put all results in one dict and save in json
+        results = {**results_desc, **results_ic, **results_af, **results_oos}
+        with open(os.path.join(sub_directory, "results.json"), "w") as f:
+            json.dump(results, f)
 
 
 
