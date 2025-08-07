@@ -1,7 +1,7 @@
 import pandas as pd
 import pingouin as pg
 
-def eval_internal_consistency(df:pd.DataFrame):
+def calc_alpha(df:pd.DataFrame):
     # compute stratified alpha if we have subscales
     if "subscale" in df.columns:
         strata = []

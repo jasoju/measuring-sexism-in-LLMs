@@ -2,18 +2,17 @@ import os
 import pandas as pd
 import matplotlib.pyplot as plt
 from matplotlib.ticker import MaxNLocator
-from scipy import stats
 import json
 
 from utils.analyses.output_data_preprocess import *
 
 def calculate_scores(df:pd.DataFrame, test:str):
     # calculate total scores
-    df_scores = df.groupby("random_state")["answer_reversed"].mean().rename("total")
+    df_scores = df.groupby("context_id")["answer_reversed"].mean().rename("total")
 
     # if we have subscales, also calculate scores for subscales
     if "subscale" in df.columns:
-        subscale_means = df.groupby(["random_state", "subscale"])["answer_reversed"].mean().unstack()
+        subscale_means = df.groupby(["context_id", "subscale"])["answer_reversed"].mean().unstack()
         # combine total mean and subscale means
         df_scores = pd.concat([df_scores, subscale_means], axis=1).reset_index()
 
