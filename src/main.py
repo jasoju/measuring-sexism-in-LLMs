@@ -1,11 +1,7 @@
 
-
 from transformers import HfArgumentParser
 from dataclasses import dataclass, field
 from typing import Optional
-import numpy as np
-import pandas as pd
-from tqdm import tqdm
 from datetime import datetime
 import re
 import json
@@ -21,7 +17,7 @@ from utils.analyses.score_corr import calc_score_corr
 class Arguments:
     """
     Arguments needed for one run:
-    - test name (scales/inventory) -> which data to load, which answer options to put into prompt, type of prompt in general
+    - test name (scale/inventory) -> which data to load
     - model id
     """
 
@@ -94,16 +90,19 @@ def main():
                               output_dir=final_directory, 
                               random=True)
 
+        # make subdirectory for results specific for type of individuals
+        sub_directory = os.path.join(final_directory, individuals)
+        os.makedirs(sub_directory)
+
         # call functions for analyses
-        sub_directory = os.path.join(final_directory, f"{individuals}")
         # descriptives
         results_desc = get_descriptives(df=standard, model_name=model_name, test=args.test, individuals=individuals, output_dir=sub_directory)
         # internal consistency
-        results_ic = calc_alpha(df=standard)
+        results_ic = calc_alpha(df=standard, test=args.test)
         # alternate form reliability
-        results_af = calc_score_corr(df1=standard, df2=af, eval="af_reliability")
+        results_af = calc_score_corr(df1=standard, df2=af, test=args.test, eval="af_reliability")
         # option order symmetry
-        results_oos = calc_score_corr(df1=standard, df2=random, eval="option_order_sym")
+        results_oos = calc_score_corr(df1=standard, df2=random, test=args.test, eval="option_order_sym")
 
         # put all results in one dict and save in json
         results = {**results_desc, **results_ic, **results_af, **results_oos}

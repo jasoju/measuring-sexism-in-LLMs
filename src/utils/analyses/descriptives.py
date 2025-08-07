@@ -16,6 +16,8 @@ def calculate_scores(df:pd.DataFrame, test:str):
         # combine total mean and subscale means
         df_scores = pd.concat([df_scores, subscale_means], axis=1).reset_index()
 
+    df_scores.set_index("context_id", inplace=True)
+
     return df_scores
 
 
@@ -30,7 +32,7 @@ def calculate_score_desc(df_scores:pd.DataFrame, output_dir:str):
     # combine into a single df
     df_stats = pd.DataFrame(stats).T  # transpose to get stat names as rows
     # save to json
-    df_stats.to_json(os.path.join(output_dir, "scores_descriptives.json"), orient="index", indent=2)
+    df_stats.to_json(os.path.join(output_dir, "scores_descriptives.json"), orient="columns", indent=2)
 
 
 def plot_score_distr(df_scores:pd.DataFrame, test:str, model_name:str, individuals:str, output_dir:str):
@@ -130,8 +132,8 @@ def get_descriptives(df:pd.DataFrame, model_name:str, test:str, individuals:str,
     plot_score_distr(df_scores=df_scores, test=test, model_name=model_name, individuals=individuals, output_dir=output_dir)
 
     # get correlations between scores of all dimensions (columns) and save correlation matrix
-    correlation_matrix = df.corr()
-    correlation_matrix.to_json(os.path.join(output_dir, "correlation_matrix_dimensions.json"), orient="split")
+    correlation_matrix = df_scores.corr()
+    correlation_matrix.to_json(os.path.join(output_dir, "corr_matrix_dimensions.json"), orient="split")
 
     # calucate item statistics (mean, variance & discrimination), safe them to json and as latex table
     calculate_item_stats(df=df, test=test, model_name=model_name, individuals=individuals, output_dir=output_dir)

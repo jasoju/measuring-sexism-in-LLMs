@@ -1,7 +1,12 @@
 import pandas as pd
 import pingouin as pg
 
-def calc_alpha(df:pd.DataFrame):
+from utils.analyses.output_data_preprocess import *
+
+def calc_alpha(df:pd.DataFrame, test:str):
+    # reverse answers
+    df.loc[:,"answer_reversed"] = df.apply(reverse_answer, axis=1, args=(test,))
+
     # compute stratified alpha if we have subscales
     if "subscale" in df.columns:
         strata = []
@@ -18,7 +23,7 @@ def calc_alpha(df:pd.DataFrame):
         stratified_terms = []
         for stratum_df in strata:
             var_h = stratum_df.sum(axis=1).var(ddof=1)
-            alpha_h = pg.cronbach_alpha(stratum_df)
+            alpha_h, _ = pg.cronbach_alpha(stratum_df)
             term = (var_h / total_var) * (1 - alpha_h)
             stratified_terms.append(term)
 
