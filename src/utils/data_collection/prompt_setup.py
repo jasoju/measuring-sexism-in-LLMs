@@ -13,9 +13,13 @@ def load_df(name:str|None) -> pd.DataFrame:
     return df
 
 
-def create_prompt(task_name:str|None,item: str, answer_options:list, random_options:bool) -> str:
+def create_prompt(task_name:str|None, item: str, answer_options:list, random_options:bool, model_id:str) -> str:
     if task_name == "ref_letter_generation":
         return item
+    
+    # wrap each option with << >> when using centaur
+    if "Centaur" in model_id:   
+        answer_options = [f"<<{opt}>>" for opt in answer_options]
 
     # shuffle the answer options if random == True
     answer_options=answer_options.copy()
@@ -57,7 +61,7 @@ def create_df(context:str|None, task_name:str, random_options:bool, model_id:str
 
     def create_message_list(item, context, answer_options):
         # set up new message containing the prompt
-        prompt = create_prompt(task_name, item, answer_options, random_options)
+        prompt = create_prompt(task_name, item, answer_options, random_options, model_id)
         message = {'content': prompt, 'role': 'user'}
         # add new message to conversation to create final chat
         if context is None:
