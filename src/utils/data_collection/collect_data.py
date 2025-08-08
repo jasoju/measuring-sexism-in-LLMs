@@ -6,23 +6,35 @@ import re
 
 from utils.data_collection.extract_answer import extract_answer
 from utils.data_collection.prompt_setup import create_df
-from utils.data_collection.model_inference import setup_generator_pipe, run_inference
+from utils.data_collection.model_inference import run_inference
 
 
 
 # main function that collects the data
-def collect_data(task_data:str, individuals:str, model_id:str, output_dir:str, random:bool):
+def collect_data(generator, task_data:str, individuals:str, model_id:str, output_dir:str, random:bool, batch_size: int=8):
     # put together pandas dataframe containing the final prompts
     df = create_df(individuals, task_data, random, model_id)
     print("df ready")
 
-    # set up generator 
-    generator = setup_generator_pipe(model_id, task_data)
-    print("generator ready")
 
     # run inference to get responses
-    tqdm.pandas(desc="Inference")
-    df = df.assign(response=df.progress_apply(run_inference, args=(generator,), axis=1))
+    responses = []
+    prompts = df["prompt"].tolist()
+
+    if individuals == "random_state":
+        do_sample = True
+        tqdm.pandas(desc="Inference ({individuals})")
+        df = df.assign(response=df.progress_apply(run_inference, args=(generator,), axis=1))
+    else:
+        do_sample = False
+        for i in tqdm(range(0, len(prompts), batch_size), desc=f"Inference ({individuals})"):
+            batch_prompts = prompts[i:i + batch_size]
+            batch_outputs = generator(batch_prompts, do_sample=do_sample)
+
+            for output in batch_outputs:
+                text = output[0]["generated_text"][-1].get("content")
+                responses.append(text)
+        df["response"] = responses
 
 
     # extract answers from responses (not applicable for predictive validity task)
@@ -41,5 +53,6 @@ def collect_data(task_data:str, individuals:str, model_id:str, output_dir:str, r
     # save completed df in output dir
     output_dir_file = os.path.join(output_dir, file_name)
     df.to_json(output_dir_file)
+
 
     return df

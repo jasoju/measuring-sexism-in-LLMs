@@ -7,9 +7,9 @@ import pandas as pd
 from tqdm import tqdm
 
 
-def setup_generator_pipe(model_id:str, task:str) -> transformers.TextGenerationPipeline:
+def setup_generator_pipe(model_id:str) -> transformers.TextGenerationPipeline:
     # set max_new_tokens based on task
-    max_new_tokens = 600 if task == "ref_letter_generation" else 20 
+    max_new_tokens = 20 
     
     # set up generator pipeline
     bnb_config = BitsAndBytesConfig(
