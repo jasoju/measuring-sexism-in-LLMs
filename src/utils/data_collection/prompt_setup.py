@@ -13,26 +13,9 @@ def load_df(name:str|None) -> pd.DataFrame:
     return df
 
 
-def create_prompt(task_name:str|None,item: str, random_options:bool) -> str:
+def create_prompt(task_name:str|None,item: str, answer_options:list, random_options:bool) -> str:
     if task_name == "ref_letter_generation":
         return item
-    elif task_name == "MSS":
-        answer_options = [
-            "1 strongly agree",
-            "2 agree",
-            "3 neither agree or disagree",
-            "4 disagree",
-            "5 strongly disagree",
-        ]
-    else:  # ASI task
-        answer_options = [
-            "0 disagree strongly",
-            "1 disagree somewhat",
-            "2 disagree slightly",
-            "3 agree slightly",
-            "4 agree somewhat",
-            "5 agree strongly",
-        ]
 
     # shuffle the answer options if random == True
     if random_options:
@@ -71,9 +54,9 @@ def create_df(context:str|None, task_name:str, random_options:bool, model_id:str
         context_df["key"] = 1
         merged_df = pd.merge(task_df, context_df, on="key").drop("key", axis=1)
 
-    def create_message_list(item, context):
+    def create_message_list(item, context, answer_options):
         # set up new message containing the prompt
-        prompt = create_prompt(task_name, item, random_options)
+        prompt = create_prompt(task_name, item, answer_options, random_options)
         message = {'content': prompt, 'role': 'user'}
         # add new message to conversation to create final chat
         if context is None:
@@ -86,11 +69,11 @@ def create_df(context:str|None, task_name:str, random_options:bool, model_id:str
     
     # apply create message list function to every row (input columns depend on context type)
     if context is None or context == "random_state":
-        merged_df["prompt"] = pd.Series([create_message_list(item, None) for item in merged_df["item"]])
+        merged_df["prompt"] = pd.Series([create_message_list(item, None, answer_options) for item, answer_options in zip(merged_df["item"], merged_df["answer_options"])])
     elif "chatbot_arena_conv" in context:
-        merged_df["prompt"] = pd.Series([create_message_list(item, conversation) for (item, conversation) in zip(merged_df["item"], merged_df["conversation"])])
+        merged_df["prompt"] = pd.Series([create_message_list(item, conversation, answer_options) for (item, conversation, answer_options) in zip(merged_df["item"], merged_df["conversation"], merged_df["answer_options"])])
     elif context == "persona_hub":
-        merged_df["prompt"] = pd.Series([create_message_list(item, persona) for (item, persona) in zip(merged_df["item"], merged_df["persona_prompt"])])
+        merged_df["prompt"] = pd.Series([create_message_list(item, persona, answer_options) for (item, persona , answer_options) in zip(merged_df["item"], merged_df["persona_prompt"], merged_df["answer_options"])])
     else:
         raise ValueError(f"{context} as context type is not allowed.")
 
