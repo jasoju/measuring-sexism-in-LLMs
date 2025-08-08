@@ -18,6 +18,7 @@ def create_prompt(task_name:str|None,item: str, answer_options:list, random_opti
         return item
 
     # shuffle the answer options if random == True
+    answer_options=answer_options.copy()
     if random_options:
         random.shuffle(answer_options)
     options_str = "\n ".join(answer_options)
@@ -71,9 +72,9 @@ def create_df(context:str|None, task_name:str, random_options:bool, model_id:str
     if context is None or context == "random_state":
         merged_df["prompt"] = pd.Series([create_message_list(item, None, answer_options) for item, answer_options in zip(merged_df["item"], merged_df["answer_options"])])
     elif "chatbot_arena_conv" in context:
-        merged_df["prompt"] = pd.Series([create_message_list(item, conversation, answer_options) for (item, conversation, answer_options) in zip(merged_df["item"], merged_df["conversation"], merged_df["answer_options"])])
+        merged_df["prompt"] = pd.Series([create_message_list(item, conversation, answer_options) for (item, conversation, answer_options) in zip(merged_df["item"], merged_df["context"], merged_df["answer_options"])])
     elif context == "persona_hub":
-        merged_df["prompt"] = pd.Series([create_message_list(item, persona, answer_options) for (item, persona , answer_options) in zip(merged_df["item"], merged_df["persona_prompt"], merged_df["answer_options"])])
+        merged_df["prompt"] = pd.Series([create_message_list(item, persona, answer_options) for (item, persona , answer_options) in zip(merged_df["item"], merged_df["context"], merged_df["answer_options"])])
     else:
         raise ValueError(f"{context} as context type is not allowed.")
 
