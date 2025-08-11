@@ -116,7 +116,7 @@ def get_descriptives(df:pd.DataFrame, model_name:str, test:str, individuals:str,
     if individuals is None:
         mean_score = df["answer_reversed"].mean()
         with open(os.path.join(output_dir, "mean_score.json"), "w") as f:
-            json.dump({"count_nan": count_nan, "mean_score": mean_score}, f)
+            json.dump({"count_nan": count_nan_answers, "mean_score": mean_score}, f)
         return  
 
     # calculate scores for each context/"individual"
