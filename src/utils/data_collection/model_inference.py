@@ -9,7 +9,7 @@ from tqdm import tqdm
 
 def setup_generator_pipe(model_id:str) -> transformers.TextGenerationPipeline:
     # set max_new_tokens based on task
-    max_new_tokens = 20 
+    max_new_tokens = 10 
     
     # set up generator pipeline
     bnb_config = BitsAndBytesConfig(
@@ -20,6 +20,10 @@ def setup_generator_pipe(model_id:str) -> transformers.TextGenerationPipeline:
     )
 
     tokenizer = AutoTokenizer.from_pretrained(model_id)
+    if model_id == "marcelbinz/Llama-3.1-Centaur-70B-adapter":
+        tokenizer.chat_template =   """{% for message in messages -%}
+                                    {{ message['role'] }}: {{ message['content'] }}
+                                    {% endfor %}"""
 
     model = AutoModelForCausalLM.from_pretrained(
         model_id, 
@@ -31,16 +35,17 @@ def setup_generator_pipe(model_id:str) -> transformers.TextGenerationPipeline:
         "text-generation",
         model=model,
         tokenizer=tokenizer,
-        max_new_tokens=max_new_tokens
+        max_new_tokens=max_new_tokens,
+        trust_remote_code=True
     )
 
     return generator
 
 
-def run_inference(row:pd.Series, generator:transformers.TextGenerationPipeline) -> str:
+def run_inference(row:pd.Series, generator:transformers.TextGenerationPipeline, individuals:str) -> str:
     # get response from model
-    if "random_state" in row:
-        set_seed(row["random_state"])
+    if individuals == "random_state":
+        set_seed(row["context_id"])
         response = generator(row["prompt"], do_sample=True)[0]["generated_text"][-1].get("content")
     else:
         response = generator(row["prompt"], do_sample=False)[0]["generated_text"][-1].get("content")
