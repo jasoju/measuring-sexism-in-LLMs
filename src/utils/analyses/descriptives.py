@@ -64,7 +64,7 @@ def calculate_item_stats(df:pd.DataFrame, test:str, model_name:str, individuals:
     variance_values = df.groupby("item_id")["answer_reversed"].var().reset_index()
     variance_values = variance_values.rename(columns={"answer_reversed": "variance"})
 
-    # discrimination (far only work id there are subscales)
+    # discrimination
     # compute full subscale totals per context
     subscale_totals = (
         df.groupby(["subscale", "context_id"])["answer_reversed"]
@@ -112,11 +112,17 @@ def get_descriptives(df:pd.DataFrame, model_name:str, test:str, individuals:str,
     # reverse items
     df.loc[:,"answer_reversed"] = df.apply(reverse_answer, axis=1, args=(test,))
 
+    # for SR2K: tranform answers to item 3 from scale 1-3 to scale 1-4
+    if test == "SR2K":
+        item_3 = df["item_id"] == 3
+        df.loc[item_3, "answer_reversed"] = 1.5 * df.loc[item_3, "answer_reversed"] - 0.5
+
     # when individuals is None only get mean score
     if individuals is None:
         mean_score = df["answer_reversed"].mean()
         with open(os.path.join(output_dir, "mean_score.json"), "w") as f:
-            json.dump({"count_nan": count_nan_answers, "mean_score": mean_score}, f)
+            json.dump({"count_nan": int(count_nan_answers), 
+                       "mean_score": float(mean_score)}, f)
         return  
 
     # calculate scores for each context/"individual"
@@ -139,4 +145,4 @@ def get_descriptives(df:pd.DataFrame, model_name:str, test:str, individuals:str,
     calculate_item_stats(df=df, test=test, model_name=model_name, individuals=individuals, output_dir=output_dir)
 
 
-    return {"count_nan_answers":count_nan_answers, "count_contexts_not_nan":count_contexts_not_nan}
+    return {"count_nan_answers":int(count_nan_answers), "count_contexts_not_nan":int(count_contexts_not_nan)}
