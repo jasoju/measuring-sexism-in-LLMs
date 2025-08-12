@@ -33,4 +33,4 @@ def calc_alpha(df:pd.DataFrame, test:str):
     else:
         alpha = pg.cronbach_alpha(data=df)[0]
 
-    return {"alpha": alpha}
+    return {"alpha": float(alpha)}

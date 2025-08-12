@@ -18,4 +18,4 @@ def calc_score_corr(df1:pd.DataFrame, df2:pd.DataFrame, test:str, eval:str):
     # calculate Pearson correlation
     r, p = stats.pearsonr(total_df["total1"], total_df["total2"])
 
-    return {eval:{"r":r, "p":p}}
+    return {eval:{"r":float(r), "p":float(p)}}
