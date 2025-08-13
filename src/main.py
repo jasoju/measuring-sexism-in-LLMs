@@ -1,7 +1,9 @@
+import os
+
 
 from transformers import HfArgumentParser
 from dataclasses import dataclass, field
-from typing import Optional
+from typing import Optional, List
 from datetime import datetime
 import re
 import json
@@ -10,6 +12,7 @@ from utils.data_collection.collect_data import collect_data
 from utils.analyses.descriptives import get_descriptives
 from utils.analyses.internal_consistency import calc_alpha
 from utils.analyses.score_corr import calc_score_corr
+from utils.data_collection.model_inference import setup_generator_pipe
 
 
 # dataclass that contains all arguments needed
@@ -27,15 +30,15 @@ class Arguments:
 
     model_id: Optional[str] = field(
         default="mistralai/Mistral-7B-Instruct-v0.3",
-        metadata={"help":"Model_id from huggingface hub (e.g. cognitivecomputations/dolphin-2.8-mistral-7b-v02, meta-llama/Llama-3.1-8B-Instruct, cognitivecomputations/Dolphin3.0-Llama3.1-8B, Qwen/Qwen2.5-7B-Instruct, meta-llama/Llama-3.3-70B-Instruct)"}
+        metadata={"help":"Model_id from huggingface hub (e.g. cognitivecomputations/dolphin-2.8-mistral-7b-v02, meta-llama/Llama-3.1-8B-Instruct, cognitivecomputations/Dolphin3.0-Llama3.1-8B, Qwen/Qwen2.5-7B-Instruct, meta-llama/Llama-3.3-70B-Instruct, marcelbinz/Llama-3.1-Centaur-70B)"}
     )
 
     output_dir: Optional[str] = field(
         default="results"
     )
 
-    individuals_list: Optional[list] = field(
-        default=["chatbot_arena_conv", "persona_hub", "random_state"]
+    individuals_list: Optional[List[str]] = field(
+        default_factory=lambda:["chatbot_arena_conv", "persona_hub", "random_state"]
     )
 
 
@@ -54,14 +57,19 @@ def main():
 
     # make directory for results
     current_directory = os.getcwd()
-    final_directory = os.path.join(current_directory, f"{args.test}_{model_name}")
+    final_directory = os.path.join(current_directory, args.output_dir, f"{args.test}_{model_name}")
     if os.path.exists(final_directory):
         raise FileExistsError(f"The directory '{final_directory}' already exists. You are using the same setup as in a previous run.")
     else:
         os.makedirs(final_directory)
 
+    # set up generator 
+    generator = setup_generator_pipe(args.model_id)
+    print("generator ready")
+
     # first collect data without inducing individuals and get mean score of model
-    no_individuals = collect_data(task_data=args.task, 
+    no_individuals = collect_data(generator=generator,
+                                  test=args.test, 
                                   individuals=None, 
                                   model_id=args.model_id, 
                                   output_dir=final_directory, 
@@ -72,19 +80,22 @@ def main():
     # for all types of individuals in individuals_list collect data and run analyses
     for individuals in args.individuals_list:
         # standard
-        standard = collect_data(task_data=args.task, 
+        standard = collect_data(generator=generator,
+                                test=args.test, 
                                 individuals=individuals, 
                                 model_id=args.model_id, 
                                 output_dir=final_directory, 
                                 random=False)
         # alternate form
-        af = collect_data(task_data=f"{args.task}_af", 
+        af = collect_data(generator=generator,
+                          test=f"{args.test}_af", 
                           individuals=individuals, 
                           model_id=args.model_id, 
                           output_dir=final_directory, 
                           random=False)
         # random order of answer options
-        random = collect_data(task_data=args.task, 
+        random = collect_data(generator=generator,
+                              test=args.test, 
                               individuals=individuals, 
                               model_id=args.model_id, 
                               output_dir=final_directory, 
@@ -112,5 +123,5 @@ def main():
 
 
 if __name__== "__main__":
-    # sample run: python main.py --task_data ASI
+    # sample run: python main.py --test ASI
     main()

@@ -8,8 +8,7 @@ from tqdm import tqdm
 
 
 def setup_generator_pipe(model_id:str) -> transformers.TextGenerationPipeline:
-    # set max_new_tokens based on task
-    max_new_tokens = 10 
+    max_new_tokens = 20 
     
     # set up generator pipeline
     bnb_config = BitsAndBytesConfig(
