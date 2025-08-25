@@ -1,7 +1,5 @@
 import pandas as pd
-import random
 from typing import Union
-import re
 
 
 def load_df(name:str|None) -> pd.DataFrame:
@@ -13,11 +11,11 @@ def load_df(name:str|None) -> pd.DataFrame:
 
 
 def create_prompt(
-        task_name:str|None, 
+        task:str|None, 
         item: str, 
         answer_options:list[str], 
         instruction:str, 
-        random_options:bool, 
+        reverse:bool, 
         model_id:str,
         change_sentence_end: bool
 ) -> Union[str, list[dict[str, str]]]:
@@ -25,7 +23,7 @@ def create_prompt(
     Create a model-ready prompt string or message list depending on the model type.
     """
 
-    if task_name == "ref_letter_generation":
+    if task == "ref_letter_generation":
         return item
     
     # Copy options to avoid modifying the original list
@@ -35,9 +33,9 @@ def create_prompt(
     if "Centaur" in model_id:   
         options = [f"<<{opt}>>" for opt in options]
 
-    # shuffle the answer options if random == True
-    if random_options:
-        random.shuffle(options)
+    # reverse the answer options if reverse == True
+    if reverse:
+        options.reverse()
 
     # join answer options in single string
     options_str = "\n ".join(options)
@@ -60,24 +58,24 @@ def create_prompt(
     return prompt
 
 
-def create_df(task_name:str, 
-              random_options:bool, 
+def create_df(task:str, 
+              reverse:bool, 
               model_id:str, 
-              change_sentence_end: bool = False
+              change_sentence_end: bool
 ) -> pd.DataFrame:
     """
     Load a task dataframe and add a column with prompts.
     """
 
-    df = load_df(task_name)
+    df = load_df(task)
 
     df["prompt"] = [
         create_prompt(
-            task_name=task_name,
+            task_name=task,
             item=item,
             answer_options=options,
             instruction=instr,
-            random_options=random_options,
+            reverse=reverse,
             model_id=model_id,
             change_sentence_end=change_sentence_end
         )
