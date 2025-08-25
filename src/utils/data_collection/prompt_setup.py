@@ -17,7 +17,7 @@ def create_prompt(
         instruction:str, 
         reverse:bool, 
         model_id:str,
-        change_sentence_end: bool
+        change_eos: bool
 ) -> Union[str, list[dict[str, str]]]:
     """
     Create a model-ready prompt string or message list depending on the model type.
@@ -41,7 +41,7 @@ def create_prompt(
     options_str = "\n ".join(options)
 
     # ending based on change_sentence_end
-    sentence_end = "?" if change_sentence_end else ":"
+    eos = "?" if change_eos else ":"
 
     # create the prompt
     prompt = f"""{instruction}
@@ -49,7 +49,7 @@ def create_prompt(
                 Statement: {item}
                 Answer options:
                 {options_str}
-                Your answer{sentence_end}"""
+                Your answer{eos}"""
     
     # create message list if model is not Centaur
     if "Centaur" not in model_id:
@@ -61,7 +61,7 @@ def create_prompt(
 def create_df(task:str, 
               reverse:bool, 
               model_id:str, 
-              change_sentence_end: bool
+              change_eos: bool
 ) -> pd.DataFrame:
     """
     Load a task dataframe and add a column with prompts.
@@ -77,7 +77,7 @@ def create_df(task:str,
             instruction=instr,
             reverse=reverse,
             model_id=model_id,
-            change_sentence_end=change_sentence_end
+            change_eos=change_eos
         )
         for item, options, instr in zip(df["item"], df["answer_options"], df["instruction"])
     ]

@@ -1,18 +1,17 @@
 import os
 
 
+
+
 from transformers import HfArgumentParser
 from dataclasses import dataclass, field
 from typing import Optional, List
-from datetime import datetime
+from vllm import LLM
+from transformers import AutoTokenizer
 import re
 import json
 
 from utils.data_collection.collect_data import collect_data
-from utils.analyses.descriptives import get_descriptives
-from utils.analyses.internal_consistency import calc_alpha
-from utils.analyses.score_corr import calc_score_corr
-from utils.data_collection.model_inference import setup_generator_pipe
 
 
 # dataclass that contains all arguments needed
@@ -20,12 +19,12 @@ from utils.data_collection.model_inference import setup_generator_pipe
 class Arguments:
     """
     Arguments needed for one run:
-    - test name (scale/inventory) -> which data to load
+    - task name (test/downstream task) -> which data to load
     - model id
     """
 
-    test: str = field(
-        metadata={"help":"Name of the psychological test which is to be evaluated. Options: 'ASI'."}
+    task: str = field(
+        metadata={"help":"Name of the task which for which data is to be collected. Options: 'ASI', 'SR2K', 'MFQ', 'ref_letter_generation'."}
     )
 
     model_id: Optional[str] = field(
@@ -34,92 +33,60 @@ class Arguments:
     )
 
     output_dir: Optional[str] = field(
-        default="results"
-    )
-
-    individuals_list: Optional[List[str]] = field(
-        default_factory=lambda:["chatbot_arena_conv", "persona_hub", "random_state"]
+        default="output_data"
     )
 
 
-
-# main function that performs one run
+# main function that performs one run of data collection (given one task and one model)
 def main():
     parser = HfArgumentParser(Arguments)
     args = parser.parse_args_into_dataclasses()[0]
 
-    # extract model name from model_id
-    model_name = re.search(r'[^/]+$', args.model_id).group(0)
-
-    # get current date and time
-    # now = datetime.now()
-    # dt_string = now.strftime("%Y-%m-%d_%H-%M")
-
-    # make directory for results
+    # make directory for output data if it does not exist yet (one dir for every task)
     current_directory = os.getcwd()
-    final_directory = os.path.join(current_directory, args.output_dir, f"{args.test}_{model_name}")
-    if os.path.exists(final_directory):
-        raise FileExistsError(f"The directory '{final_directory}' already exists. You are using the same setup as in a previous run.")
-    else:
+    final_directory = os.path.join(current_directory, args.output_dir, args.task)
+    if not os.path.exists(final_directory):
         os.makedirs(final_directory)
 
-    # set up generator 
-    generator = setup_generator_pipe(args.model_id)
-    print("generator ready")
+    # create LLM
+    llm = LLM(model=args.model_id, generation_config="auto")
+    tokenizer = AutoTokenizer.from_pretrained(args.model_id)
 
-    # first collect data without inducing individuals and get mean score of model
-    no_individuals = collect_data(generator=generator,
-                                  test=args.test, 
-                                  individuals=None, 
-                                  model_id=args.model_id, 
-                                  output_dir=final_directory, 
-                                  random=False)
-    # get descriptives (function automatically saves a json with results when using no individuals)
-    get_descriptives(df=no_individuals, model_name=model_name, test=args.test, individuals=None, output_dir=final_directory)
+    # run the standard setup (works for psychological tests and downstream tasks)
+    collect_data(llm=llm,
+                tokenizer=tokenizer,
+                task=args.task, 
+                model_id=args.model_id, 
+                output_dir=final_directory, 
+                reverse=False,
+                change_eos=False)
     
-    # for all types of individuals in individuals_list collect data and run analyses
-    for individuals in args.individuals_list:
-        # standard
-        standard = collect_data(generator=generator,
-                                test=args.test, 
-                                individuals=individuals, 
-                                model_id=args.model_id, 
-                                output_dir=final_directory, 
-                                random=False)
+    # also collect data for reliability evaluation if task is a psychological test
+    if args.task in ["ASI", "SR2K", "MFQ"]:
         # alternate form
-        af = collect_data(generator=generator,
-                          test=f"{args.test}_af", 
-                          individuals=individuals, 
-                          model_id=args.model_id, 
-                          output_dir=final_directory, 
-                          random=False)
-        # random order of answer options
-        random = collect_data(generator=generator,
-                              test=args.test, 
-                              individuals=individuals, 
-                              model_id=args.model_id, 
-                              output_dir=final_directory, 
-                              random=True)
-
-        # make subdirectory for results specific for type of individuals
-        sub_directory = os.path.join(final_directory, individuals)
-        os.makedirs(sub_directory)
-
-        # call functions for analyses
-        # descriptives
-        results_desc = get_descriptives(df=standard, model_name=model_name, test=args.test, individuals=individuals, output_dir=sub_directory)
-        # internal consistency
-        results_ic = calc_alpha(df=standard, test=args.test)
-        # alternate form reliability
-        results_af = calc_score_corr(df1=standard, df2=af, test=args.test, eval="af_reliability")
-        # option order symmetry
-        results_oos = calc_score_corr(df1=standard, df2=random, test=args.test, eval="option_order_sym")
-
-        # put all results in one dict and save in json
-        results = {**results_desc, **results_ic, **results_af, **results_oos}
-        with open(os.path.join(sub_directory, "results.json"), "w") as f:
-            json.dump(results, f)
-
+        collect_data(llm=llm,
+                    tokenizer=tokenizer,
+                    task=f"{args.task}_af", 
+                    model_id=args.model_id, 
+                    output_dir=final_directory, 
+                    reverse=False,
+                    change_eos=False)
+        # reversed order of answer options
+        collect_data(llm=llm,
+                    tokenizer=tokenizer,
+                    task=args.task, 
+                    model_id=args.model_id, 
+                    output_dir=final_directory, 
+                    reverse=True,
+                    change_eos=False)
+        # change end of sentence in prompt
+        collect_data(llm=llm,
+                    tokenizer=tokenizer,
+                    task=args.task, 
+                    model_id=args.model_id, 
+                    output_dir=final_directory, 
+                    reverse=False,
+                    change_eos=True)
 
 
 if __name__== "__main__":
