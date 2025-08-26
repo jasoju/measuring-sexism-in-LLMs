@@ -11,3 +11,11 @@ def extract_answer(response, test):
 
     match = re.search(pattern, response)
     return int(match.group()) if match else np.nan
+
+
+def reverse_answer(answer:int, reversed:bool, answer_options:list) -> int:
+    if np.isnan(answer):
+        return answer 
+    if reversed:
+        return len(answer_options) - answer
+    return answer 

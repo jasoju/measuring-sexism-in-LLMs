@@ -58,17 +58,6 @@ def get_file_vars(file:str):
     return context_var, context_name, context_file, model_name, model_id, task
 
 
-def reverse_answer(row:pd.Series, task:str) -> int:
-    # set anchor depending on task (i.e. length of the used likert scale)
-    anchor = 6 if task=="MSS" else 5
-
-    if np.isnan(row["answer"]):
-        return row["answer"]
-    if row["reversed"]:
-        return anchor - row["answer"]  
-    return row["answer"]  
-
-
 def sample_from_quartiles(df:pd.DataFrame, quartiles:list, col="total", n=10):
     q1 = df[df[col] <= quartiles[0]]
     q2 = df[(df[col] > quartiles[0]) & (df[col] <= quartiles[1])]

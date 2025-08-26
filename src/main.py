@@ -2,14 +2,11 @@ import os
 
 
 
-
 from transformers import HfArgumentParser
 from dataclasses import dataclass, field
-from typing import Optional, List
+from typing import Optional
 from vllm import LLM
 from transformers import AutoTokenizer
-import re
-import json
 
 from utils.data_collection.collect_data import collect_data
 
@@ -52,6 +49,7 @@ def main():
     llm = LLM(model=args.model_id, generation_config="auto")
     tokenizer = AutoTokenizer.from_pretrained(args.model_id)
 
+    print("-------------------- Standard Setup --------------------")
     # run the standard setup (works for psychological tests and downstream tasks)
     collect_data(llm=llm,
                 tokenizer=tokenizer,
@@ -64,6 +62,7 @@ def main():
     # also collect data for reliability evaluation if task is a psychological test
     if args.task in ["ASI", "SR2K", "MFQ"]:
         # alternate form
+        print("-------------------- Alternate Form --------------------")
         collect_data(llm=llm,
                     tokenizer=tokenizer,
                     task=f"{args.task}_af", 
@@ -72,6 +71,7 @@ def main():
                     reverse=False,
                     change_eos=False)
         # reversed order of answer options
+        print("-------------------- Reversed Order --------------------")
         collect_data(llm=llm,
                     tokenizer=tokenizer,
                     task=args.task, 
@@ -80,6 +80,7 @@ def main():
                     reverse=True,
                     change_eos=False)
         # change end of sentence in prompt
+        print("-------------------- Changed EOS --------------------")
         collect_data(llm=llm,
                     tokenizer=tokenizer,
                     task=args.task, 
@@ -90,5 +91,5 @@ def main():
 
 
 if __name__== "__main__":
-    # sample run: python main.py --test ASI
+    # sample run: python main.py --task ASI
     main()

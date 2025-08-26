@@ -3,7 +3,7 @@ import numpy as np
 import pandas as pd
 import re
 
-from utils.data_collection.extract_answer import extract_answer
+from utils.data_collection.extract_answer import extract_answer, reverse_answer
 from utils.data_collection.prompt_setup import create_df
 from utils.data_collection.model_inference import run_inference
 
@@ -51,7 +51,7 @@ def collect_data(llm,
 
         # create df for that particular run
         df_seed = df.copy()
-        # sdd seed and response columns
+        # add seed and response columns
         df_seed["seed"] = seed
         df_seed["response"] = responses
         # append to list
@@ -60,11 +60,13 @@ def collect_data(llm,
     # concatenate all seed dfs into one
     final_df = pd.concat(df_list, ignore_index=True)
 
-    # extract answers from responses (not applicable for downstream tasks)
-    if task == "ref_letter_generation":
-        final_df["answer"] = [np.nan] * len(final_df.index)
+    # extract answers from responses and reverse answer for reversed items (not applicable for downstream tasks)
+    if task in ["ASI", "SR2K", "MFQ"]:
+        final_df["answer"] = [extract_answer(response, task) for response in final_df["response"]]
+        final_df["answer_reversed"] = [reverse_answer(answer, reversed, answer_options) for answer, reversed, answer_options in zip(final_df["answer"], final_df["reversed"], final_df["answer_options"])]
     else:
-        final_df["answer"] = pd.Series([extract_answer(response, task) for response in final_df["response"]])
+        final_df["answer"] = [np.nan] * len(final_df.index)
+        final_df["answer_reversed"] = [np.nan] * len(final_df.index)
     
 
     # extract model name from model_id
