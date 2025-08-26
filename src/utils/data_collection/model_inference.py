@@ -1,5 +1,5 @@
 
-def run_inference(llm, tokenizer, sampling_params, prompts, seed, model_id) -> list[str]:
+def run_inference(llm, tokenizer, sampling_params, prompts, model_id) -> list[str]:
     # for all models except Centaur apply chat template (prompts are already in list format)
     if "Centaur" not in model_id:   
         prompts = tokenizer.apply_chat_template(

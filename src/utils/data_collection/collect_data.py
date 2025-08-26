@@ -47,7 +47,7 @@ def collect_data(llm,
         # set random seed
         sampling_params.seed = seed
         # run inference to get list of model responses
-        responses = run_inference(llm, tokenizer, sampling_params, df["prompt"].tolist(), seed, model_id)
+        responses = run_inference(llm, tokenizer, sampling_params, df["prompt"].tolist(), model_id)
 
         # create df for that particular run
         df_seed = df.copy()
@@ -75,7 +75,7 @@ def collect_data(llm,
     elif change_eos:
         suffix = "_changed_eos"
     else: # also includes alternate form setup
-        ""
+        suffix = ""
 
     # create file name based on arguments
     file_name = f"{model_name}__{task}{suffix}.json"

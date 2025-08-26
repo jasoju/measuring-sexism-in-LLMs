@@ -71,7 +71,7 @@ def create_df(task:str,
 
     df["prompt"] = [
         create_prompt(
-            task_name=task,
+            task=task,
             item=item,
             answer_options=options,
             instruction=instr,
@@ -84,9 +84,3 @@ def create_df(task:str,
 
 
     return df
-
-
-
-
-
-
