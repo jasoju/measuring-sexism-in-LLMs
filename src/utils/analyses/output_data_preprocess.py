@@ -1,5 +1,45 @@
 import pandas as pd
 import numpy as np
+import os
+import json 
+
+def load_and_concat_jsons(base_dir: str, subfolder: str, file_suffix: str, model_filter: str = None) -> pd.DataFrame:
+    """
+    Loads all JSON files from a specified subfolder inside base_dir that match the task_name.
+    Optionally filters by model name. Adds 'model_name' column and concatenates into one DataFrame.
+
+    Parameters:
+        base_dir (str): Path to the main directory (e.g., "output_data").
+        subfolder (str): Name of the subfolder (e.g., "ASI", "MFQ").
+        file_suffix (str): Suffix to filter files (e.g., "ASI", "ASI_af").
+        model_filter (str, optional): If provided, only files starting with this model name are loaded.
+
+    Returns:
+        pd.DataFrame: Concatenated DataFrame with all data and a 'model_name' column.
+    """
+    folder_path = os.path.join(base_dir, subfolder)
+    print(folder_path)
+    all_dfs = []
+
+    for filename in os.listdir(folder_path):
+        if filename.endswith(f"{file_suffix}.json"):
+            model_name = filename.split("__")[0]
+
+            # Skip if model_filter is provided and doesn't match
+            if model_filter and model_name != model_filter:
+                continue
+
+            file_path = os.path.join(folder_path, filename)
+            with open(file_path, 'r') as f:
+                data = json.load(f)
+
+            df = pd.DataFrame(data)
+            df['model_name'] = model_name
+            all_dfs.append(df)
+
+    return pd.concat(all_dfs, ignore_index=True) if all_dfs else pd.DataFrame()
+
+
 
 
 def get_file_vars(file:str):

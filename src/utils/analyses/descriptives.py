@@ -6,22 +6,26 @@ import json
 
 from utils.analyses.output_data_preprocess import *
 
-def calculate_scores(df:pd.DataFrame, test:str):
+def calculate_scores(df:pd.DataFrame, test:str, individual:str, output_dir:str):
     # calculate total scores
-    df_scores = df.groupby("context_id")["answer_reversed"].mean().rename("total")
+    df_scores = df.groupby(individual)["avg_answer_reversed"].mean().rename("total")
 
     # if we have subscales, also calculate scores for subscales
     if "subscale" in df.columns:
-        subscale_means = df.groupby(["context_id", "subscale"])["answer_reversed"].mean().unstack()
+        subscale_means = df.groupby([individual, "subscale"])["avg_answer_reversed"].mean().unstack()
         # combine total mean and subscale means
         df_scores = pd.concat([df_scores, subscale_means], axis=1).reset_index()
 
-    df_scores.set_index("context_id", inplace=True)
+    df_scores.set_index(individual, inplace=True)
+
+    # save in json
+    df_scores.to_json(os.path.join(output_dir,"scores_per_model.json"), orient="columns", indent=2)
 
     return df_scores
 
 
-def calculate_score_desc(df_scores:pd.DataFrame, output_dir:str):
+
+def calculate_score_desc(df_scores:pd.DataFrame, output_dir:str) -> pd.DataFrame:
     # calculate descriptive statistics for scores
     stats = {
     "mean": df_scores.mean(),
@@ -31,13 +35,15 @@ def calculate_score_desc(df_scores:pd.DataFrame, output_dir:str):
     }
     # combine into a single df
     df_stats = pd.DataFrame(stats).T  # transpose to get stat names as rows
+
     # save to json
-    df_stats.to_json(os.path.join(output_dir, "scores_descriptives.json"), orient="columns", indent=2)
+    df_stats.to_json(os.path.join(output_dir,"scores_descriptives.json"), orient="columns", indent=2)
+    
 
 
-def plot_score_distr(df_scores:pd.DataFrame, test:str, model_name:str, individuals:str, output_dir:str):
-    if test=="MSS":
-        r = (1, 5)
+def plot_score_distr(df_scores:pd.DataFrame, test:str, output_dir:str):
+    if test=="SR2K":
+        r = (1, 4)
     else:
         r = (0, 5)
 
@@ -52,54 +58,33 @@ def plot_score_distr(df_scores:pd.DataFrame, test:str, model_name:str, individua
     plt.gca().xaxis.set_major_locator(MaxNLocator(integer=True))
 
     # save plot
-    plt.savefig(os.path.join(output_dir, f"distr_{test}_score__{model_name}__{individuals}.png"), bbox_inches="tight")
+    plt.savefig(os.path.join(output_dir, f"{test}_score_distr.png"), bbox_inches="tight")
 
 
-def calculate_item_stats(df:pd.DataFrame, test:str, model_name:str, individuals:str, output_dir:str):
+def calculate_item_stats(df:pd.DataFrame, test:str, output_dir:str):
     # mean
-    mean_values = df.groupby("item_id")["answer_reversed"].mean().reset_index()
-    mean_values = mean_values.rename(columns={"answer_reversed": "mean"})
+    mean_values = df.groupby("item_id")["avg_answer_reversed"].mean().reset_index()
+    mean_values = mean_values.rename(columns={"avg_answer_reversed": "mean"})
 
-    # variance
-    variance_values = df.groupby("item_id")["answer_reversed"].var().reset_index()
-    variance_values = variance_values.rename(columns={"answer_reversed": "variance"})
-
-    # discrimination
-    # compute full subscale totals per context
-    subscale_totals = (
-        df.groupby(["subscale", "context_id"])["answer_reversed"]
-        .sum()
-        .reset_index()
-        .rename(columns={"answer_reversed": "subscale_total"})
-    )
-    # merge full subscale totals into main df
-    df = df.merge(subscale_totals, on=["subscale", "context_id"])
-    # subtract item score to get part-whole corrected subscale score
-    df["subscale_total_corrected"] = df["subscale_total"] - df["answer_reversed"]
-    # for each item, compute the correlation between item score and corrected subscale score
-    discrimination_values = (
-        df.groupby("item_id")
-        .apply(lambda group: group["answer_reversed"].corr(group["subscale_total_corrected"]))
-        .reset_index()
-        .rename(columns={0: "discrimination"})
-    )
+    # std
+    std_values = df.groupby("item_id")["avg_answer_reversed"].var().reset_index()
+    std_values = std_values.rename(columns={"avg_answer_reversed": "std"})
 
     # merge all stats into a single dataframe
-    stats_df = mean_values.merge(variance_values, on="item_id")
-    stats_df = stats_df.merge(discrimination_values, on="item_id")
+    stats_df = mean_values.merge(std_values, on="item_id")
 
     # safe stats to json
     stats_df.set_index("item_id").to_json(os.path.join(output_dir, "item_stats.json"), orient="index", indent=2)
 
     # safe stats to latex table
-    stats_df[["mean", "variance", "discrimination"]].to_latex(
-        buf = os.path.join(output_dir, f"{test}_item_stats__{model_name}__{individuals}.tex"),
-        header = ["M", "var", "discrimination"],
+    stats_df[["mean", "std"]].to_latex(
+        buf = os.path.join(output_dir, f"{test}_item_stats.tex"),
+        header = ["M", "std"],
         na_rep = "",
         float_format = "%.2f",
-        column_format = "lSSS",
-        caption = "{test} item statistics ({model_name}, {individuals})".format(test=test, model_name=model_name, individuals=individuals),
-        label = "tab:{test}__item_statistics__{model_name}__{individuals}".format(test=test, model_name=model_name, individuals=individuals),
+        column_format = "lSS",
+        caption = "{test} item statistics".format(test=test),
+        label = "tab:{test}__item_statistics".format(test=test),
         )
 
 
