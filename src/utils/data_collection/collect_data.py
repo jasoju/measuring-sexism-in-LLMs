@@ -61,7 +61,7 @@ def collect_data(llm,
     final_df = pd.concat(df_list, ignore_index=True)
 
     # extract answers from responses and reverse answer for reversed items (not applicable for downstream tasks)
-    if task in ["ASI", "SR2K", "MFQ"]:
+    if task in ["ASI", "ASI_af", "SR2K", "SR2K_af", "MFQ", "MFQ_af"]:
         final_df["answer"] = [extract_answer(response, task) for response in final_df["response"]]
         final_df["answer_reversed"] = [reverse_answer(answer, reversed, answer_options) for answer, reversed, answer_options in zip(final_df["answer"], final_df["reversed"], final_df["answer_options"])]
     else:
