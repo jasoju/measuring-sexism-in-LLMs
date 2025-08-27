@@ -1,10 +1,9 @@
 import os
 
 
-
 from transformers import HfArgumentParser
 from dataclasses import dataclass, field
-from typing import Optional
+from typing import Optional, List
 from vllm import LLM
 from transformers import AutoTokenizer
 
@@ -20,7 +19,8 @@ class Arguments:
     - model id
     """
 
-    task: str = field(
+    task: Optional[List[str]] = field(
+        default_factory=lambda:["chatbot_arena_conv", "persona_hub", "random_state"], 
         metadata={"help":"Name of the task which for which data is to be collected. Options: 'ASI', 'SR2K', 'MFQ', 'ref_letter_generation'."}
     )
 
@@ -39,55 +39,58 @@ def main():
     parser = HfArgumentParser(Arguments)
     args = parser.parse_args_into_dataclasses()[0]
 
-    # make directory for output data if it does not exist yet (one dir for every task)
-    current_directory = os.getcwd()
-    final_directory = os.path.join(current_directory, args.output_dir, args.task)
-    if not os.path.exists(final_directory):
-        os.makedirs(final_directory)
-
     # create LLM
     llm = LLM(model=args.model_id, generation_config="auto")
     tokenizer = AutoTokenizer.from_pretrained(args.model_id)
 
-    print("-------------------- Standard Setup --------------------")
-    # run the standard setup (works for psychological tests and downstream tasks)
-    collect_data(llm=llm,
-                tokenizer=tokenizer,
-                task=args.task, 
-                model_id=args.model_id, 
-                output_dir=final_directory, 
-                reverse=False,
-                change_eos=False)
-    
-    # also collect data for reliability evaluation if task is a psychological test
-    if args.task in ["ASI", "SR2K", "MFQ"]:
-        # alternate form
-        print("-------------------- Alternate Form --------------------")
+    for task in args.task:
+        print(f"---------------------------------------- {task} ----------------------------------------")
+
+        # make directory for output data if it does not exist yet (one dir for every task)
+        current_directory = os.getcwd()
+        final_directory = os.path.join(current_directory, args.output_dir, task)
+        if not os.path.exists(final_directory):
+            os.makedirs(final_directory)
+
+        print("-------------------- Standard Setup --------------------")
+        # run the standard setup (works for psychological tests and downstream tasks)
         collect_data(llm=llm,
                     tokenizer=tokenizer,
-                    task=f"{args.task}_af", 
+                    task=task, 
                     model_id=args.model_id, 
                     output_dir=final_directory, 
                     reverse=False,
                     change_eos=False)
-        # reversed order of answer options
-        print("-------------------- Reversed Order --------------------")
-        collect_data(llm=llm,
-                    tokenizer=tokenizer,
-                    task=args.task, 
-                    model_id=args.model_id, 
-                    output_dir=final_directory, 
-                    reverse=True,
-                    change_eos=False)
-        # change end of sentence in prompt
-        print("-------------------- Changed EOS --------------------")
-        collect_data(llm=llm,
-                    tokenizer=tokenizer,
-                    task=args.task, 
-                    model_id=args.model_id, 
-                    output_dir=final_directory, 
-                    reverse=False,
-                    change_eos=True)
+        
+        # also collect data for reliability evaluation if task is a psychological test
+        if task in ["ASI", "SR2K", "MFQ"]:
+            # alternate form
+            print("-------------------- Alternate Form --------------------")
+            collect_data(llm=llm,
+                        tokenizer=tokenizer,
+                        task=f"{task}_af", 
+                        model_id=args.model_id, 
+                        output_dir=final_directory, 
+                        reverse=False,
+                        change_eos=False)
+            # reversed order of answer options
+            print("-------------------- Reversed Order --------------------")
+            collect_data(llm=llm,
+                        tokenizer=tokenizer,
+                        task=task, 
+                        model_id=args.model_id, 
+                        output_dir=final_directory, 
+                        reverse=True,
+                        change_eos=False)
+            # change end of sentence in prompt
+            print("-------------------- Changed EOS --------------------")
+            collect_data(llm=llm,
+                        tokenizer=tokenizer,
+                        task=task, 
+                        model_id=args.model_id, 
+                        output_dir=final_directory, 
+                        reverse=False,
+                        change_eos=True)
 
 
 if __name__== "__main__":
