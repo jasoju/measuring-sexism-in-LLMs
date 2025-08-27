@@ -13,9 +13,10 @@ def extract_answer(response, test):
     return int(match.group()) if match else np.nan
 
 
-def reverse_answer(answer:int, reversed:bool, answer_options:list) -> int:
+def reverse_answer(answer:int, reversed:bool, answer_options:list, task:str) -> int:
     if np.isnan(answer):
+        return answer
+    if not reversed:
         return answer 
-    if reversed:
-        return len(answer_options) - answer
-    return answer 
+    
+    return len(answer_options) - answer + (1 if task == "SR2K" else 0)
