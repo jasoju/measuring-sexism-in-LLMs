@@ -172,4 +172,4 @@ figures/
 tables/
 tests/
 results/
-output_data/
+src/output_data/
