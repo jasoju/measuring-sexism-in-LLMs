@@ -40,6 +40,15 @@ def load_and_concat_jsons(base_dir: str, subfolder: str, file_suffix: str, model
     return pd.concat(all_dfs, ignore_index=True) if all_dfs else pd.DataFrame()
 
 
+def save_sample_for_eval(df:pd.DataFrame, n:int, dir:str):
+    os.makedirs(dir, exist_ok=True)
+
+    # group by model_name and sample
+    for model, group in df.groupby('model_name'):
+        sampled_df = group.sample(n=n, random_state=42)  
+        output_path = os.path.join(dir, f"{model}_sampled.csv")
+        sampled_df.to_csv(output_path, index=False)
+
 
 
 def get_file_vars(file:str):
