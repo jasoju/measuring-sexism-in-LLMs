@@ -1,6 +1,7 @@
 import os
 
 
+
 from transformers import HfArgumentParser
 from dataclasses import dataclass, field
 from typing import Optional, List
@@ -33,6 +34,16 @@ class Arguments:
         default="output_data"
     )
 
+    num_gpus: Optional[int] = field(
+        default=1,
+        metadata={"help":"Number of GPUs used"}
+    )
+
+
+    max_model_len: Optional[int] = field(
+        default=20000,
+        metadata={"help":"max_model_len used when initializing LLM"}
+    )
 
 # main function that performs one run of data collection (given one task and one model)
 def main():
@@ -40,7 +51,10 @@ def main():
     args = parser.parse_args_into_dataclasses()[0]
 
     # create LLM
-    llm = LLM(model=args.model_id, generation_config="auto")
+    llm = LLM(model=args.model_id, 
+              generation_config="auto",
+              tensor_parallel_size=args.num_gpus,
+              max_model_len=args.max_model_len)
     tokenizer = AutoTokenizer.from_pretrained(args.model_id)
 
     for task in args.task:
