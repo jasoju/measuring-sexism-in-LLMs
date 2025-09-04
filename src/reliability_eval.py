@@ -1,7 +1,7 @@
 import os
 
 from utils.analyses.output_data_preprocess import *
-from utils.analyses.reliability import *
+from utils.analyses.psychometrics import *
 
 # set all needed directories
 current_dir = os.getcwd()
@@ -20,7 +20,7 @@ for task in tasks:
     df_og = load_and_concat_jsons(base_dir=output_data_dir, subfolder=task, file_suffix=task)
     df_og["version"] = "og"
 
-    # append og versin
+    # append og version
     all_dfs.append(df_og)
 
     for version in versions:
