@@ -46,19 +46,41 @@ def plot_score_distr(df_scores:pd.DataFrame, test:str, output_dir:str):
         r = (1, 4)
     else:
         r = (0, 5)
+    
+    if test == "MFQ":
+        df_scores = df_scores.rename(columns={"Harm": "Care"})   # rename Harm to Care in MFQ 
 
-    plt.figure(figsize=(10, 6))
-    plt.hist(df_scores["total"], bins=20, range=r, edgecolor="black", rwidth=1.0)
+    # determine which columns to plot
+    cols_to_plot = ["Authority", "Fairness", "Care", "Ingroup", "Purity"] if test == "MFQ" else ["total"]
 
-    # add labels and title
-    plt.xlabel(f"{test} score", fontsize=12)
-    plt.ylabel("Frequency", fontsize=12)
-    #plt.title(f"Distribution of {task} scores ({model_name}, {context_name})", fontsize=14)
+    for col in cols_to_plot:
+        # Sort by column scores
+        df_scores_sorted = df_scores.sort_values(col, ascending=False)
+        mean_value = df_scores_sorted[col].mean()
 
-    plt.gca().xaxis.set_major_locator(MaxNLocator(integer=True))
+        # Plot
+        plt.figure(figsize=(8, 6))
+        for i, (model, score) in enumerate(zip(df_scores_sorted.index, df_scores_sorted[col])):
+            plt.hlines(y=model, xmin=r[0], xmax=score, color="lightgrey", linewidth=2)
+            plt.plot(score, model, "o", color="blue")
 
-    # save plot
-    plt.savefig(os.path.join(output_dir, f"{test}_score_distr.png"), bbox_inches="tight")
+        # Add mean line
+        plt.axvline(x=mean_value, color='red', linestyle='--', linewidth=1)
+        _, y_top = plt.gca().get_ylim()
+        plt.text(mean_value + 0.05, y_top, f"Mean: {mean_value:.2f}", 
+                 color='red', ha='left', va='bottom', fontsize=10)
+
+        # Labels
+        plt.xlabel(f"{test} score ({col})", fontsize=12)
+        plt.ylabel("Model", fontsize=12)
+        plt.xlim(r)
+        plt.gca().invert_yaxis()
+        plt.gca().xaxis.set_major_locator(MaxNLocator(integer=True))
+
+        # Save plot
+        filename = f"{test}_score_distr_{col}.png" if test == "MFQ" else f"{test}_score_distr.png"
+        plt.savefig(os.path.join(output_dir, filename), bbox_inches="tight")
+        plt.close()
 
 
 def calculate_item_stats(df:pd.DataFrame, test:str, output_dir:str):
