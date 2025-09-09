@@ -24,32 +24,32 @@ def create_prompt(
     """
 
     if task == "ref_letter_generation":
-        return item
-    
-    # Copy options to avoid modifying the original list
-    options = answer_options.copy()
-    
-    # wrap each option with << >> when using centaur
-    if "Centaur" in model_id:   
-        options = [f"<<{opt}>>" for opt in options]
+        prompt = item
+    else: # task is a psychological test
+        # Copy options to avoid modifying the original list
+        options = answer_options.copy()
+        
+        # wrap each option with << >> when using centaur
+        if "Centaur" in model_id:   
+            options = [f"<<{opt}>>" for opt in options]
 
-    # reverse the answer options if reverse == True
-    if reverse:
-        options.reverse()
+        # reverse the answer options if reverse == True
+        if reverse:
+            options.reverse()
 
-    # join answer options in single string
-    options_str = "\n ".join(options)
+        # join answer options in single string
+        options_str = "\n ".join(options)
 
-    # ending based on change_sentence_end
-    eos = "?" if change_eos else ":"
+        # ending based on change_sentence_end
+        eos = "?" if change_eos else ":"
 
-    # create the prompt
-    prompt = f"""{instruction}
-                Read the statement below carefully and select ONE of the listed options and start your answer with a single digit. 
-                Statement: {item}
-                Answer options:
-                {options_str}
-                Your answer{eos}"""
+        # create the prompt
+        prompt = f"""{instruction}
+                    Read the statement below carefully and select ONE of the listed options and start your answer with a single digit. 
+                    Statement: {item}
+                    Answer options:
+                    {options_str}
+                    Your answer{eos}"""
     
     # create message list if model is not Centaur
     if "Centaur" not in model_id:
