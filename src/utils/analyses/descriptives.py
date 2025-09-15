@@ -55,7 +55,10 @@ def plot_score_distr(df_scores:pd.DataFrame, test:str, output_dir:str):
 
     for col in cols_to_plot:
         # Sort by column scores
-        df_scores_sorted = df_scores.sort_values(col, ascending=False)
+        if test =="SR2K":
+            df_scores_sorted = df_scores.sort_values(col, ascending=True)
+        else:    
+            df_scores_sorted = df_scores.sort_values(col, ascending=False)
         mean_value = df_scores_sorted[col].mean()
 
         # Plot
