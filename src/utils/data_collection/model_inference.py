@@ -8,7 +8,9 @@ def run_inference(llm, tokenizer, sampling_params, prompts, model_id) -> list[st
             add_generation_prompt=True,
         )
 
+    # print for debugging
     print(f"---------- seed: {sampling_params.seed} ----------")
+    print("max_tokens:", sampling_params.max_tokens)
 
     # generate model responses
     outputs = llm.generate(prompts, sampling_params, use_tqdm=True)

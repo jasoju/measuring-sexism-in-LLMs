@@ -32,15 +32,16 @@ def collect_data(llm,
     print("temperature:", sampling_params.temperature)
 
     # set max_tokens based on task
-    if task == "ref_letter_generation":
-        sampling_params.max_new_tokens = 600
+    if task in ["ASI", "SR2K", "MFQ"]:
+        sampling_params.max_tokens = 20 
     else: 
-        sampling_params.max_new_tokens = 20
+        sampling_params.max_tokens = 1000
+
 
     # create list to store results for all seeds
     df_list = []
 
-    # set list of random seeds with length 5 (we want 5 runs)
+    # set list of seeds with length 5 (we want 5 runs)
     seeds = list(range(1, 6))
     # run inference for each seed
     for seed in seeds:

@@ -4,7 +4,7 @@ import re
 import pandas as pd
 from concurrent.futures import ThreadPoolExecutor
 
-import utils.word_constants as word_constants
+import utils.analyses.word_constants as word_constants
 
 def count_words(texts, word_patterns):
     """

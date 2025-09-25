@@ -5,6 +5,8 @@ import matplotlib.pyplot as plt
 import math
 from sklearn.preprocessing import MinMaxScaler
 import matplotlib.patches as mpatches
+from matplotlib.ticker import MultipleLocator
+from scipy.stats import spearmanr
 
 from utils.analyses.output_data_preprocess import *
 
@@ -37,12 +39,8 @@ def calc_fraction_same_answer(df:pd.DataFrame, version:str, output_dir:str):
 
 
 
-def plot_two_column_heatmap(col1: pd.Series, col2: pd.Series, col_labels=("col1", "col2")):
+def plot_rank_scatter(col1: pd.Series, col2: pd.Series, dir:str, r:float, p:float, line="up", col_labels=("col1", "col2"), ):
     """
-    Plot a heatmap for two pandas Series with opposite color scaling:
-    - col1: high values = more saturated
-    - col2: low values = more saturated
-
     Parameters
     ----------
     col1 : pd.Series
@@ -53,38 +51,49 @@ def plot_two_column_heatmap(col1: pd.Series, col2: pd.Series, col_labels=("col1"
         Labels for the two columns in the heatmap (default=("col1", "col2")).
     """
     
-    # Combine into a DataFrame
+    # combine into a df
     df = pd.DataFrame({col_labels[0]: col1, col_labels[1]: col2})
     
-    # Sort by the first column
-    df_sorted = df.sort_values(by=col_labels[0], ascending=False)
-    
-     # Rank transformation
-    col1_rank = df_sorted[col_labels[0]].rank(method="min") / len(df_sorted)  # high = dark
-    col2_rank = (len(df_sorted) - df_sorted[col_labels[1]].rank(method="min") + 1) / len(df_sorted)  # low = dark
-    
-    # Construct normalized rank DataFrame
-    df_norm = pd.DataFrame(
-        {col_labels[0]: col1_rank, col_labels[1]: col2_rank},
-        index=df_sorted.index
-    )
-    
-    # Plot heatmap
-    plt.figure(figsize=(6, len(df_sorted) * 0.3))
-    sns.heatmap(df_norm, annot=df_sorted, fmt=".2f", cmap="Blues", cbar=False)
+    df['rank_col1'] = df[col_labels[0]].rank(ascending=(col_labels[0]!="Racism"))
+    df['rank_col2'] = df[col_labels[1]].rank(ascending=(col_labels[1]!="Racism"))
 
-    plt.title("Rank-based Heatmap")
-    plt.xlabel("Columns")
-    plt.ylabel(f"Models (sorted by {col_labels[0]} score)")
-    plt.tight_layout()
-    plt.show()
+
+    # plot
+    #sns.set_theme(font_scale=2)
+    plt.figure(figsize=(6, 6))
+    sns.scatterplot(x='rank_col1', y='rank_col2', data=df, s=45)
+
+    lims = [
+        min(df['rank_col1'].min(), df['rank_col2'].min()),
+        max(df['rank_col1'].max(), df['rank_col2'].max())
+    ]
+    if line=="down":
+        plt.plot(lims, [lims[1] - (x - lims[0]) for x in lims], color="grey", linestyle="--")
+    else:
+        plt.plot(lims, lims, color="grey", linestyle="--")
+
+    plt.text(1, 12.8, "$r_s = {:.2f}$".format(r), fontsize=15)
+    plt.text(1, 12.1, "$p = {:.2f}$".format(p), fontsize=15)
+
+    plt.gca().xaxis.set_major_locator(MultipleLocator(1))
+    plt.gca().yaxis.set_major_locator(MultipleLocator(1))
+
+
+    plt.xlabel(f"rank({col_labels[0]})", fontsize=15)
+    plt.ylabel(f"rank({col_labels[1]})", fontsize=15)
+    # plt.title("Scatter plot of ranks")
+
+    # Save plot
+    filename = f"scatter_{col_labels[0]}_{col_labels[1]}.png"
+    plt.savefig(os.path.join(dir, filename), bbox_inches="tight")
+    plt.close()
 
 
 def spearman_rank_corr(col1: pd.Series, col2: pd.Series, col_labels=("col1", "col2"), alternative="two-sided"):
     # Combine into a DataFrame
     df = pd.DataFrame({col_labels[0]: col1, col_labels[1]: col2})
 
-    r = stats.spearmanr(df)
+    r = stats.spearmanr(df, alternative=alternative)
 
     # calculate CI
     count = len(df)

@@ -23,7 +23,7 @@ def create_prompt(
     Create a model-ready prompt string or message list depending on the model type.
     """
 
-    if task == "ref_letter_generation":
+    if task in ["ref_letter_generation", "housing_recommendation"]:
         prompt = item
     else: # task is a psychological test
         # Copy options to avoid modifying the original list
@@ -82,5 +82,7 @@ def create_df(task:str,
         for item, options, instr in zip(df["item"], df["answer_options"], df["instruction"])
     ]
 
+    # only use subset of data for debugging
+    # df = df.head(n=1)
 
     return df

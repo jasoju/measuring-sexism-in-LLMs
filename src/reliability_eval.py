@@ -37,7 +37,7 @@ for task in tasks:
 
 
 # save random sample (across og & all versions) for each model for evalaution of answer extraction
-save_sample_for_eval(df=pd.concat(all_dfs, ignore_index=True), n=100, dir=os.path.join(current_dir,"evaluation"))
+# save_sample_for_eval(df=pd.concat(all_dfs, ignore_index=True), n=100, dir=os.path.join(current_dir,"evaluation"))
 
 
 
