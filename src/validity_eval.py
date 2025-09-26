@@ -29,18 +29,18 @@ with open(file_path, 'r') as f:
 # sexism-racism
 r,lower,upper = spearman_rank_corr(df_ASI["total"], df_SR2K["total"], col_labels=("sexism", "racism"), alternative="less")
 print(f"sexism-racism: {r} [{lower}, {upper}]")
-plot_rank_scatter(df_ASI["total"], df_SR2K["total"], dir=os.path.join(results_dir,"convergent"), r=abs(r[0]), p=r[1], col_labels=("Sexism", "Racism"))
+plot_rank_scatter(df_ASI["total"], df_SR2K["total"], dir=os.path.join(results_dir,"convergent"), r=abs(r[0]), p=r[1], col_labels=("ASI", "SR2K"))
 
 # authority-benevolent sexism
 r,lower,upper = spearman_rank_corr(df_MFQ["Authority"], df_ASI["BS"], col_labels=("authority", "BS"), alternative="greater")
 print(f"authority-BS: {r} [{lower}, {upper}]")
-plot_rank_scatter(df_MFQ["Authority"], df_ASI["BS"], dir=os.path.join(results_dir,"convergent"), r=r[0], p=r[1], col_labels=("Authority", "BS"))
+plot_rank_scatter(df_MFQ["Authority"], df_ASI["BS"], dir=os.path.join(results_dir,"convergent"), r=r[0], p=r[1], col_labels=("MFQ-Authority", "ASI-Benevolent sexism"))
 
 # fairness-hostile sexism
 # plot_two_column_heatmap(df_MFQ["Fairness"], df_ASI["HS"], dir=os.path.join(results_dir,"convergent"), col_labels=("fairness", "HS"))
 r,lower,upper = spearman_rank_corr(df_MFQ["Fairness"], df_ASI["HS"], col_labels=("fairness", "HS"), alternative="less")
 print(f"fairness-HS: {r} [{lower}, {upper}]")
-plot_rank_scatter(df_MFQ["Fairness"], df_ASI["HS"], dir=os.path.join(results_dir,"convergent"), r=r[0], p=r[1], line="down", col_labels=("Fairness", "HS"))
+plot_rank_scatter(df_MFQ["Fairness"], df_ASI["HS"], dir=os.path.join(results_dir,"convergent"), r=r[0], p=r[1], line="down", col_labels=("MFQ-Fairness", "ASI-Hostile sexism"))
 
 
 
@@ -68,6 +68,7 @@ merged = df_ref_wide[["sexism_score"]].join(df_ASI[["total"]])
 r,lower,upper = spearman_rank_corr(merged["sexism_score"], merged["total"], alternative="greater")
 print(f"sexism ecological: {r} [{lower}, {upper}]") 
 plot_rank_scatter(merged["total"], merged["sexism_score"], dir=os.path.join(results_dir,"ecological"), r=r[0], p=r[1], col_labels=("ASI", "Reference letter generation"))
+
 
 ####### racism #######
 

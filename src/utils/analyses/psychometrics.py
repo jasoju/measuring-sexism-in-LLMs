@@ -33,7 +33,7 @@ def calc_fraction_same_answer(df:pd.DataFrame, version:str, output_dir:str):
 
     # Calculate fraction of matches per model
     result = pivot_df.groupby('model_name')['match'].mean().reset_index()
-    result.rename(columns={'match': 'fraction_match'}, inplace=True)
+    result.rename(columns={'match': version}, inplace=True)
 
     result.to_json(os.path.join(output_dir, f"rel_eval_{version}.json"), orient="index", indent=2)
 

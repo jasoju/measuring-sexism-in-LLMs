@@ -23,6 +23,7 @@ for task in tasks:
     # append og version
     all_dfs.append(df_og)
 
+
     for version in versions:
         # load version a´data
         df_version = load_and_concat_jsons(base_dir=output_data_dir, subfolder=task, file_suffix=f"{task}_{version}")
