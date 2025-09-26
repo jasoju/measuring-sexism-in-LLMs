@@ -35,7 +35,7 @@ def collect_data(llm,
     if task in ["ASI", "SR2K", "MFQ"]:
         sampling_params.max_tokens = 20 
     else: 
-        sampling_params.max_tokens = 1000
+        sampling_params.max_tokens = 1500
 
 
     # create list to store results for all seeds
