@@ -54,8 +54,8 @@ def plot_rank_scatter(col1: pd.Series, col2: pd.Series, dir:str, r:float, p:floa
     # combine into a df
     df = pd.DataFrame({col_labels[0]: col1, col_labels[1]: col2})
     
-    df['rank_col1'] = df[col_labels[0]].rank(ascending=(col_labels[0]!="Racism"))
-    df['rank_col2'] = df[col_labels[1]].rank(ascending=(col_labels[1]!="Racism"))
+    df['rank_col1'] = df[col_labels[0]].rank(ascending=(col_labels[0]=="SR2K"))
+    df['rank_col2'] = df[col_labels[1]].rank(ascending=(col_labels[1]=="SR2K"))
 
 
     # plot
