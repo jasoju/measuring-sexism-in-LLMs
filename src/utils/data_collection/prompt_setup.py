@@ -23,7 +23,7 @@ def create_prompt(
     Create a model-ready prompt string or message list depending on the model type.
     """
 
-    if task in ["ref_letter_generation", "housing_recommendation"]:
+    if task in ["ref_letter_generation", "housing_recommendation", "advice_DD", "advice_reddit"]:
         prompt = item
     else: # task is a psychological test
         # Copy options to avoid modifying the original list
