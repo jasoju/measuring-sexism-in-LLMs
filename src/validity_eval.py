@@ -72,5 +72,15 @@ plot_rank_scatter(merged["total"], merged["sexism_score"], dir=os.path.join(resu
 
 ####### racism #######
 
+df_hr = pd.read_csv("results/ecological/housing_per_model.csv")
+df_hr = df_hr.set_index("model")
+
+merged = df_hr[["mean_difference"]].join(df_SR2K[["total"]])
+
+r,lower,upper = spearman_rank_corr(merged["mean_difference"], merged["total"], alternative="less")
+print(f"racism ecological: {r} [{lower}, {upper}]") 
+plot_rank_scatter(merged["total"], merged["mean_difference"], dir=os.path.join(results_dir,"ecological"), r=r[0]*(-1), p=r[1], col_labels=("SR2K", "Housing recommendation"))
+
+
 ####### morality #######
 
