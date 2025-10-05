@@ -14,9 +14,8 @@ def calc_fraction_same_answer(df:pd.DataFrame, version:str, output_dir:str):
     # filter
     df_sub = df[df['version'].isin(["og", version])]
 
-    # pivot so that we have answers of versions side by side
     pivot_df = df_sub.pivot_table(
-        index=['item_id', 'model_name'],
+        index=['item_id', 'model_name', 'seed'],
         columns='version',
         values='answer_reversed'
     ).reset_index()
@@ -32,7 +31,7 @@ def calc_fraction_same_answer(df:pd.DataFrame, version:str, output_dir:str):
     pivot_df['match'] = pivot_df.apply(check_match, axis=1)
 
     # Calculate fraction of matches per model
-    result = pivot_df.groupby('model_name')['match'].mean().reset_index()
+    result = result = pivot_df.groupby(['model_name', 'seed'])['match'].mean().reset_index()
     result.rename(columns={'match': version}, inplace=True)
 
     result.to_json(os.path.join(output_dir, f"rel_eval_{version}.json"), orient="index", indent=2)
@@ -72,8 +71,8 @@ def plot_rank_scatter(col1: pd.Series, col2: pd.Series, dir:str, r:float, p:floa
     else:
         plt.plot(lims, lims, color="grey", linestyle="--")
 
-    plt.text(1, 12.8, "$r_s = {:.2f}$".format(r), fontsize=15)
-    plt.text(1, 12.1, "$p = {:.2f}$".format(p), fontsize=15)
+    plt.text(1, lims[1]-0.2, "$r_s = {:.2f}$".format(r), fontsize=15)
+    plt.text(1, lims[1]-0.9, "$p = {:.2f}$".format(p), fontsize=15)
 
     plt.gca().xaxis.set_major_locator(MultipleLocator(1))
     plt.gca().yaxis.set_major_locator(MultipleLocator(1))
