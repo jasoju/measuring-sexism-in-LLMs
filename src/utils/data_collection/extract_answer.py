@@ -4,7 +4,7 @@ import re
 import numpy as np
 
 def extract_answer(response, test):
-    if test == "SR2K":
+    if "SR2K" in test:
         pattern = r"[1-4]"
     else: # ASI & MFQ
         pattern = r"[0-5]"
@@ -19,4 +19,4 @@ def reverse_answer(answer:int, reversed:bool, answer_options:list, task:str) -> 
     if not reversed:
         return answer 
     
-    return len(answer_options) - answer + (1 if task == "SR2K" else 0)
+    return len(answer_options) - answer + (1 if "SR2K" in task else 0)
