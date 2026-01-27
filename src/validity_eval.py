@@ -53,7 +53,7 @@ plot_rank_scatter(df_MFQ["fairness"], df_ASI["HS"], dir=os.path.join(results_dir
 ############## ecological validity ##############
 
 ####### sexism #######
-"""
+
 df_ref = load_and_concat_jsons(base_dir=output_data_dir, subfolder="ref_letter_generation", file_suffix="")
 
 df_ref_wide = df_ref.groupby("model_name").apply(
@@ -66,8 +66,10 @@ OR_columns = [col for col in df_ref_wide.columns if "OR" in col]
 
 # calculate overall sexism score for each context by averaging over OR values
 df_ref_wide["sexism_score"] = df_ref_wide[OR_columns].mean(axis=1)
+df_ref_wide["std"] = df_ref_wide[OR_columns].std(axis=1)
 
 df_ref_wide = df_ref_wide.set_index("model_name")
+print(df_ref_wide)
 # merge on index
 merged = df_ref_wide[["sexism_score"]].join(df_ASI[["total"]])
 merged = merged.join(df_r["ASI"])
@@ -81,14 +83,14 @@ plot_rank_scatter(merged["total"], merged["sexism_score"], dir=os.path.join(resu
 ####### racism #######
 df_hr = pd.read_csv("results/ecological/housing_per_model.csv")
 df_hr = df_hr.set_index("model")
-print(df_hr.head(n=13))
+print(df_hr)
 
 merged = df_hr[["mean_difference"]].join(df_SR2K[["total"]])
 
 r,lower,upper = spearman_rank_corr(merged["mean_difference"], merged["total"], alternative="less")
 print(f"racism ecological: {r} [{lower}, {upper}]") 
 plot_rank_scatter(merged["total"], merged["mean_difference"], dir=os.path.join(results_dir,"ecological"), r=r[0]*(-1), p=r[1], hue=df_r["SR2K"], construct="racism", col_labels=("Test (rank)", "Downstream behavior (rank)"))
-"""
+
 
 ####### morality #######
 df_advice = load_and_concat_jsons(base_dir=output_data_dir, subfolder="advice", file_suffix="")
@@ -117,7 +119,17 @@ df_advice_agg = df_advice.pivot_table(
 
 print(df_advice_agg)
 
-dimensions = ["authority", "care", "fairness", "ingroup", "purity"]
+df_advice_agg_std = df_advice.pivot_table(
+    index='model_name',
+    columns='subscale',
+    values='match',
+    aggfunc='std',
+    fill_value=0  # Fills cells with 0 where a model doesn't have a subscale
+)
+
+print(df_advice_agg_std)
+
+dimensions = ["authority", "care", "fairness", "ingroup", "purity"]  
 
 for dim in dimensions:
     merged = df_advice_agg[[f"{dim}"]].join(df_MFQ[[f"{dim}"]], lsuffix='_task', rsuffix='_test')

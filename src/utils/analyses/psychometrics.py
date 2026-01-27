@@ -53,7 +53,7 @@ def plot_rank_scatter(col1: pd.Series, col2: pd.Series, dir:str, r:float, p:floa
     # --- 1. Define Model-Specific Maps ---
     # The keys must match the model names exactly as they appear in your DataFrame's index.
     model_colors = {
-        'Llama-3.1-Centaur-70B': "#EC29F3",  # Purple
+        'Llama-3.1-Centaur-70B': "#FF7214",  # Purple
         'gemma-3-1b-it': "#00800061",       # Green 1
         'gemma-3-4b-it': "#0080008D",       # Green 2
         'gemma-3-12b-it': "#008000C1",      # Green 3
@@ -61,11 +61,15 @@ def plot_rank_scatter(col1: pd.Series, col2: pd.Series, dir:str, r:float, p:floa
         'Llama-3.1-8B-Instruct': "#4C008257",  # Medium Purple 1
         'Llama-3.1-70B-Instruct': "#4C0082A2", # Indigo
         'Llama-3.3-70B-Instruct': '#4B0082', # Orange Red
-        'Mistral-7B-Instruct-v0.3': '#1E90FF', # Dodger Blue
-        'Qwen2.5-7B-Instruct': "#DFA11C76",    # DarkGoldenrod 1
-        'Qwen2.5-14B-Instruct': "#DFA11CAE",   # Goldenrod 2
-        'Qwen2.5-32B-Instruct': '#DFA11C',   # Gold 3
-        'Qwen3-4B-Instruct-2507': "#DFA11C4C"  # Hot Pink
+        'Mistral-7B-Instruct-v0.3': "#1E8FFF7F", # Dodger Blue
+        'Mistral-Large-Instruct-2411': '#1E90FF',
+        'Qwen2.5-7B-Instruct': "#DFA11C63",    # DarkGoldenrod 1
+        'Qwen2.5-14B-Instruct': "#DFA11C8F",   # Goldenrod 2
+        'Qwen2.5-32B-Instruct': "#DFA11CC7",
+        'Qwen2.5-72B-Instruct': '#DFA11C',  # Gold 3
+        'Qwen3-4B-Instruct-2507': "#DFA11C4C",  # Hot Pink
+        'gemini-2.5-flash': "#D537DA84",
+        'gemini-2.5-pro': "#D437DA"
     }
 
     model_markers = {
@@ -78,10 +82,14 @@ def plot_rank_scatter(col1: pd.Series, col2: pd.Series, dir:str, r:float, p:floa
         'Llama-3.1-70B-Instruct': 'o', # Circle
         'Llama-3.3-70B-Instruct': 'o', # Square
         'Mistral-7B-Instruct-v0.3': '^', # Cross (filled)
+        'Mistral-Large-Instruct-2411': '^',
         'Qwen2.5-7B-Instruct': 'D',    # Plus (filled)
         'Qwen2.5-14B-Instruct': 'D',   # Plus (filled)
-        'Qwen2.5-32B-Instruct': 'D',   # Plus (filled)
+        'Qwen2.5-32B-Instruct': 'D',
+        'Qwen2.5-72B-Instruct': 'D',   # Plus (filled)
         'Qwen3-4B-Instruct-2507': 'D',  # Star
+        'gemini-2.5-flash': 'p',
+        'gemini-2.5-pro': 'p'
     }
 
     model_display_names = {
@@ -94,10 +102,14 @@ def plot_rank_scatter(col1: pd.Series, col2: pd.Series, dir:str, r:float, p:floa
         'Llama-3.1-70B-Instruct': 'Llama 3.1 70B',
         'Llama-3.3-70B-Instruct': 'Llama 3.3 70B',
         'Mistral-7B-Instruct-v0.3': 'Mistral 7B v0.3',
+        'Mistral-Large-Instruct-2411': 'Mistral-Large 123B',
         'Qwen2.5-7B-Instruct': 'Qwen 2.5 7B',
         'Qwen2.5-14B-Instruct': 'Qwen 2.5 14B',
         'Qwen2.5-32B-Instruct': 'Qwen 2.5 32B',
+        'Qwen2.5-72B-Instruct': 'Qwen 2.5 72B',
         'Qwen3-4B-Instruct-2507': 'Qwen 3 4B',
+        'gemini-2.5-flash': 'Gemini 2.5 Flash',
+        'gemini-2.5-pro': 'Gemini 2.5 Pro'
     }
 
     custom_legend_order = [
@@ -113,11 +125,16 @@ def plot_rank_scatter(col1: pd.Series, col2: pd.Series, dir:str, r:float, p:floa
         'gemma-3-27b-it',
         
         'Mistral-7B-Instruct-v0.3',
+        'Mistral-Large-Instruct-2411',
         
         'Qwen3-4B-Instruct-2507',
         'Qwen2.5-7B-Instruct',
         'Qwen2.5-14B-Instruct',
         'Qwen2.5-32B-Instruct',
+        'Qwen2.5-72B-Instruct',
+
+        'gemini-2.5-flash',
+        'gemini-2.5-pro'
     ]
 
 
@@ -135,7 +152,7 @@ def plot_rank_scatter(col1: pd.Series, col2: pd.Series, dir:str, r:float, p:floa
     # plot
     #sns.set_theme(font_scale=2)
     # Plot Setup
-    plt.figure(figsize=(5,4.5))
+    plt.figure(figsize=(6.2,5.7))
     ax = plt.gca()
     
     # Remove borders (spines)
@@ -164,13 +181,13 @@ def plot_rank_scatter(col1: pd.Series, col2: pd.Series, dir:str, r:float, p:floa
     if line=="down":
         # Grey dashed line: y = constant - x (negative correlation)
         grey_line_handle, = plt.plot(lims, [lims[1] - (x - lims[0]) for x in lims], color="grey", linestyle="--")
-        grey_line_label = "Perfect Negative Rank Correlation"
+        grey_line_label = "expected $r_s$"
     else:
         # Grey dashed line: y = x (positive correlation)
         grey_line_handle, = plt.plot(lims, lims, color="grey", linestyle="--")
         grey_line_label = "expected $r_s$"
 
-    plt.text(lims[1]+0.5, -0.2, "$r_s = {:.2f}$".format(r), fontsize=15)
+    plt.text(lims[1]-5.6, -0.2, "$r_s = {:.2f}$".format(r), fontsize=15)
     #plt.text(1, lims[1]-0.9, "$p = {:.2f}$".format(p), fontsize=15)
 
     plt.gca().xaxis.set_major_locator(MultipleLocator(1))
